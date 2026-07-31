@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Two Supports Beam Reaction Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            touch-action: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation Banner -->
+    <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-400/20 p-2.5 rounded-xl border border-amber-400/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-bridge text-xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide uppercase text-white flex items-center gap-2">
+                        TWO SUPPORTS BEAM REACTION SIMULATOR
+                    </h1>
+                    <p class="text-[11px] text-slate-300">Calculate Reaction Forces at Support A (R<sub>A</sub>) and Support B (R<sub>B</sub>) using Equilibrium Equations</p>
+                </div>
+            </div>
+            
+            <!-- Actions Widget -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Navigation Home -->
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+
+                <!-- Reset Button -->
+                <button onclick="resetSimulator()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container: Side-by-Side Layout -->
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- LEFT COLUMN (LG: COL-7): VISUAL BEAM CANVAS & STEP-BY-STEP ALGEBRA -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <!-- Section Header -->
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-amber-500"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Beam Diagram with Supports A & B</h2>
+                        </div>
+                        <span id="badge-equilibrium-status" class="bg-emerald-100 text-emerald-900 font-extrabold text-[11px] px-3 py-1 rounded-lg border border-emerald-300 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-scale-balanced text-emerald-600"></i> Equilibrium State (&Sigma; F<sub>y</sub> = 0, &Sigma; M<sub>A</sub> = 0)
+                        </span>
+                    </div>
+
+                    <!-- Canvas Interactive Beam -->
+                    <div class="canvas-container rounded-xl overflow-hidden h-[340px] sm:h-[380px] flex items-center justify-center relative">
+                        <canvas id="beamCanvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Top-Left Datum Legend Overlay -->
+                        <div id="overlay-datum-badge" class="absolute top-3 left-3 bg-indigo-900/90 backdrop-blur-sm border border-indigo-700 text-white font-extrabold text-[11px] px-3 py-1 rounded-lg shadow-sm">
+                            <span id="txt-beam-len-badge">BEAM LENGTH L = 10.0 m</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Helper Metric Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 text-center">
+                        <div class="bg-blue-50/70 border border-blue-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-blue-700 font-bold block uppercase">Net Vertical Load (&Sigma; F<sub>y</sub>)</span>
+                            <span id="metric-total-f" class="text-xs sm:text-sm font-extrabold text-blue-900 font-mono-code">0.0 N</span>
+                        </div>
+                        <div class="bg-emerald-50/70 border border-emerald-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-emerald-700 font-bold block uppercase">Sum of Moments about A</span>
+                            <span id="metric-total-ma" class="text-xs sm:text-sm font-extrabold text-emerald-900 font-mono-code">0.0 N·m</span>
+                        </div>
+                        <div class="bg-amber-50/70 border border-amber-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-amber-700 font-bold block uppercase">Reaction Force R<sub>A</sub></span>
+                            <span id="metric-ra" class="text-xs sm:text-sm font-extrabold text-amber-900 font-mono-code">0.00 N</span>
+                        </div>
+                        <div class="bg-purple-50/70 border border-purple-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-purple-700 font-bold block uppercase">Reaction Force R<sub>B</sub></span>
+                            <span id="metric-rb" class="text-xs sm:text-sm font-extrabold text-purple-900 font-mono-code">0.00 N</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step-by-Step Derivation Card -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">Reaction Forces Equation Solution</h3>
+                    </div>
+
+                    <div id="math-steps-container" class="space-y-2.5 font-mono-code text-xs">
+                        <!-- Dynamic Math injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (LG: COL-5): SYSTEM SETTINGS & FORCE CONTROLS -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                
+                <!-- Controls Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-600"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Beam & Support Settings</h2>
+                        </div>
+                    </div>
+
+                    <!-- SYSTEM CONFIGURATION PANEL -->
+                    <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200 space-y-2.5 mb-4">
+                        <div class="font-extrabold text-xs text-indigo-950 flex items-center justify-between border-b border-indigo-200/80 pb-1">
+                            <span><i class="fa-solid fa-gear text-indigo-600 mr-1"></i> Beam & Supports Configuration</span>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <!-- Beam Length Selector -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Beam Length (L):
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="input-beam-length" min="1" max="100" step="0.5" value="10"
+                                           class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                           oninput="changeBeamLength(this.value)" placeholder="10">
+                                    <span class="font-bold text-xs text-indigo-900">m</span>
+                                </div>
+                            </div>
+
+                            <!-- Support A Position -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Support A (x<sub>A</sub>):
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="input-support-a" min="0" max="100" step="0.1" value="2.0"
+                                           class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                           oninput="updateSupportPos('A', this.value)">
+                                    <span class="font-bold text-xs text-indigo-900">m</span>
+                                </div>
+                            </div>
+
+                            <!-- Support B Position -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Support B (x<sub>B</sub>):
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="input-support-b" min="0" max="100" step="0.1" value="8.0"
+                                           class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                           oninput="updateSupportPos('B', this.value)">
+                                    <span class="font-bold text-xs text-indigo-900">m</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Distance Display Mode -->
+                        <div class="pt-1 border-t border-indigo-200/60 flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-slate-700">Display Interval Spacing (X<sub>1</sub>, X<sub>2</sub>, ...):</span>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="chk-show-intervals" checked onchange="updatePhysics()" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 relative"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Force List Header & Add Button -->
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Active Forces (F<sub>1</sub>, F<sub>2</sub>, F<sub>n</sub>)
+                        </span>
+                        <button onclick="addForce()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-plus"></i> Add Force
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Force Input Cards Container -->
+                    <div id="forces-input-container" class="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+                        <!-- Dynamic Force Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Theory Formula Card Footer -->
+                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 text-xs space-y-1">
+                    <span class="font-bold text-amber-950 block uppercase text-[11px]">Equilibrium Principle for 2 Supports:</span>
+                    <p class="text-slate-700 text-[11px] leading-relaxed">
+                        1. From Principle of Moment of Force, &Sigma;F(upward) = &Sigma;F(downward)<br>
+                        2. Take moments about Support A (F<sub>A</sub>): &Sigma; M<sub>ccw</sub> = &Sigma; M<sub>cw</sub>, Find F<sub>B</sub><br>
+                        3. Vertical equilibrium, Find F<sub>A</sub>
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Custom Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1736] text-slate-400 py-3 text-center text-xs mt-auto border-t border-indigo-900/40">
+        <p>Two Supports Beam Reaction Simulator &bull; Science Unit JMSK, PPD</p>
+    </footer>
+
+    <script>
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function (x, y, w, h, r) {
+                if (typeof r === 'number') r = [r, r, r, r];
+                const radius = r[0] || 0;
+                this.beginPath();
+                this.moveTo(x + radius, y);
+                this.lineTo(x + w - radius, y);
+                this.quadraticCurveTo(x + w, y, x + w, y + radius);
+                this.lineTo(x + w, y + h - radius);
+                this.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+                this.lineTo(x + radius, y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - radius);
+                this.lineTo(x, y + radius);
+                this.quadraticCurveTo(x, y, x + radius, y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        let beamLength = 10;   // Total length of beam in meters
+        let supportA = 2.0;     // Position of Support A in meters
+        let supportB = 8.0;     // Position of Support B in meters
+
+        // Default initial force system: All values start at 0 except angle at 90°
+        let forces = [
+            { id: 1, F: 0, x: 0.0, dir: 'down', angle: 90 },
+            { id: 2, F: 0, x: 0.0, dir: 'down', angle: 90 },
+            { id: 3, F: 0, x: 0.0, dir: 'down', angle: 90 }
+        ];
+
+        let nextForceId = 4;
+
+        const canvas = document.getElementById('beamCanvas');
+        const ctx = canvas.getContext('2d');
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            renderForceInputCards();
+            updatePhysics();
+            requestAnimationFrame(animateLoop);
+        };
+
+        function showNotification(msg, type) {
+            type = type || 'info';
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = 'px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold transition-all transform duration-300 pointer-events-auto flex items-center gap-2 ' + 
+                (type === 'error' ? 'bg-rose-900 text-white border-rose-700' : 'bg-indigo-900 text-white border-indigo-700');
+            toast.innerHTML = '<i class="fa-solid ' + (type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info') + '"></i> ' + msg;
+            
+            container.appendChild(toast);
+            setTimeout(function() {
+                toast.style.opacity = '0';
+                setTimeout(function() { toast.remove(); }, 300);
+            }, 3000);
+        }
+
+        function resizeCanvas() {
+            if (!canvas || !canvas.parentElement) return;
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        function changeBeamLength(val) {
+            let newLen = parseFloat(val);
+            if (isNaN(newLen) || newLen <= 0) return;
+
+            beamLength = newLen;
+            supportA = Math.min(supportA, beamLength);
+            supportB = Math.min(supportB, beamLength);
+
+            const inputA = document.getElementById('input-support-a');
+            const inputB = document.getElementById('input-support-b');
+            if (inputA) inputA.value = supportA.toFixed(1);
+            if (inputB) inputB.value = supportB.toFixed(1);
+
+            forces.forEach(function(f) {
+                f.x = parseFloat(Math.min(beamLength, f.x).toFixed(1));
+            });
+
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function updateSupportPos(type, val) {
+            let parsed = parseFloat(val);
+            if (isNaN(parsed)) parsed = 0;
+            parsed = Math.max(0, Math.min(beamLength, parsed));
+
+            if (type === 'A') {
+                supportA = parsed;
+            } else {
+                supportB = parsed;
+            }
+            updatePhysics();
+        }
+
+        function applyPresetImage() {
+            // Preset matching the user's diagram with 2 supports:
+            // Beam L = 13m
+            // Support A at 4m, Support B at 9m
+            // F1 = 30N at 2m (2m left of A)
+            // F2 = 22N at 6.5m (2.5m right of A)
+            // F3 = 38N at 11m (2m right of B)
+            beamLength = 13.0;
+            supportA = 4.0;
+            supportB = 9.0;
+
+            const bInput = document.getElementById('input-beam-length');
+            if (bInput) bInput.value = 13.0;
+
+            const inputA = document.getElementById('input-support-a');
+            const inputB = document.getElementById('input-support-b');
+            if (inputA) inputA.value = 4.0;
+            if (inputB) inputB.value = 9.0;
+
+            forces = [
+                { id: 1, F: 30, x: 2.0, dir: 'down', angle: 90 },
+                { id: 2, F: 22, x: 6.5, dir: 'down', angle: 90 },
+                { id: 3, F: 38, x: 11.0, dir: 'down', angle: 90 }
+            ];
+            nextForceId = 4;
+
+            renderForceInputCards();
+            updatePhysics();
+            showNotification("Image Example loaded: 30N, 22N, 38N on 13m beam.");
+        }
+
+        function resetSimulator() {
+            beamLength = 10;
+            supportA = 2.0;
+            supportB = 8.0;
+
+            const bInput = document.getElementById('input-beam-length');
+            if (bInput) bInput.value = 10;
+
+            const inputA = document.getElementById('input-support-a');
+            const inputB = document.getElementById('input-support-b');
+            if (inputA) inputA.value = 2.0;
+            if (inputB) inputB.value = 8.0;
+
+            forces = [
+                { id: 1, F: 0, x: 0.0, dir: 'down', angle: 90 },
+                { id: 2, F: 0, x: 0.0, dir: 'down', angle: 90 },
+                { id: 3, F: 0, x: 0.0, dir: 'down', angle: 90 }
+            ];
+            nextForceId = 4;
+            renderForceInputCards();
+            updatePhysics();
+            showNotification("Simulator reset to zero default state.");
+        }
+
+        function addForce() {
+            if (forces.length >= 6) {
+                showNotification("Maximum of 6 forces allowed for layout clarity.", "error");
+                return;
+            }
+            forces.push({
+                id: nextForceId++,
+                F: 0,
+                x: 0.0,
+                dir: 'down',
+                angle: 90
+            });
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function removeForce(id) {
+            if (forces.length <= 1) {
+                showNotification("At least one force is required.", "error");
+                return;
+            }
+            forces = forces.filter(function(f) { return f.id !== id; });
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function updateForceParam(id, key, value) {
+            const force = forces.find(function(f) { return f.id === id; });
+            if (force) {
+                if (key === 'dir') {
+                    force.dir = value; // 'down' or 'up'
+                } else {
+                    let parsedVal = parseFloat(value);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+                    
+                    if (key === 'x') {
+                        parsedVal = Math.max(0, Math.min(beamLength, parsedVal));
+                    } else if (key === 'F') {
+                        parsedVal = Math.max(0, parsedVal);
+                    } else if (key === 'angle') {
+                        parsedVal = Math.max(10, Math.min(170, parsedVal));
+                    }
+
+                    force[key] = parsedVal;
+
+                    const sliderEl = document.getElementById('slider-' + key + '-' + id);
+                    const inputEl = document.getElementById('input-' + key + '-' + id);
+                    if (sliderEl) sliderEl.value = parsedVal;
+                    if (inputEl && document.activeElement !== inputEl) inputEl.value = parsedVal;
+                }
+
+                updatePhysics();
+            }
+        }
+
+        function renderForceInputCards() {
+            const container = document.getElementById('forces-input-container');
+            if (!container) return;
+            let html = '';
+
+            forces.sort(function(a, b) { return a.x - b.x; });
+
+            forces.forEach(function(f, index) {
+                let isUp = f.dir === 'up';
+                let isAngled = f.angle !== 90;
+                let perpF = (f.F * Math.sin((f.angle * Math.PI) / 180)).toFixed(1);
+
+                html += '<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative">' +
+                        '<div class="flex items-center justify-between font-bold text-xs border-b border-slate-200/60 pb-1.5">' +
+                            '<span class="text-indigo-900 flex items-center gap-1.5">' +
+                                '<i class="fa-solid ' + (isUp ? 'fa-arrow-up text-blue-600' : 'fa-arrow-down text-rose-500') + '"></i> Force F<sub>' + (index + 1) + '</sub>' +
+                            '</span>' +
+                            '<div class="flex items-center gap-2">' +
+                                '<select onchange="updateForceParam(' + f.id + ', \'dir\', this.value)" ' +
+                                        'class="bg-white border font-bold text-[11px] rounded px-1.5 py-0.5 ' + (isUp ? 'text-blue-700 border-blue-400' : 'text-rose-700 border-rose-400') + ' focus:outline-none cursor-pointer">' +
+                                    '<option value="down" ' + (!isUp ? 'selected' : '') + '>&darr; Downward</option>' +
+                                    '<option value="up" ' + (isUp ? 'selected' : '') + '>&uarr; Upward</option>' +
+                                '</select>' +
+                                '<button onclick="removeForce(' + f.id + ')" class="text-rose-500 hover:text-rose-700 text-xs px-1" title="Delete Force">' +
+                                    '<i class="fa-solid fa-trash-can"></i>' +
+                                '</button>' +
+                            '</div>' +
+                        '</div>' +
+                        '<div class="grid grid-cols-3 gap-2 text-xs">' +
+                            '<div>' +
+                                '<div class="flex justify-between items-center mb-1 text-[10px]">' +
+                                    '<span class="text-slate-600 font-bold">Force (F):</span>' +
+                                    '<div class="flex items-center gap-0.5">' +
+                                        '<input type="number" id="input-F-' + f.id + '" min="0" max="1000" step="1" value="' + f.F + '" ' +
+                                               'class="w-12 bg-white border border-rose-300 font-bold text-rose-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none" ' +
+                                               'oninput="updateForceParam(' + f.id + ', \'F\', this.value)">' +
+                                        '<span class="font-bold text-rose-600">N</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<input type="range" id="slider-F-' + f.id + '" min="0" max="200" value="' + f.F + '" step="1" ' +
+                                       'class="w-full accent-rose-500 cursor-pointer" ' +
+                                       'oninput="updateForceParam(' + f.id + ', \'F\', this.value)">' +
+                            '</div>' +
+                            '<div>' +
+                                '<div class="flex justify-between items-center mb-1 text-[10px]">' +
+                                    '<span class="text-slate-600 font-bold">Angle (&theta;):</span>' +
+                                    '<div class="flex items-center gap-0.5">' +
+                                        '<input type="number" id="input-angle-' + f.id + '" min="10" max="170" step="1" value="' + f.angle + '" ' +
+                                               'class="w-12 bg-white border border-amber-300 font-bold text-amber-700 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none" ' +
+                                               'oninput="updateForceParam(' + f.id + ', \'angle\', this.value)">' +
+                                        '<span class="font-bold text-amber-700">&deg;</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<input type="range" id="slider-angle-' + f.id + '" min="10" max="170" value="' + f.angle + '" step="1" ' +
+                                       'class="w-full accent-amber-500 cursor-pointer" ' +
+                                       'oninput="updateForceParam(' + f.id + ', \'angle\', this.value)">' +
+                            '</div>' +
+                            '<div>' +
+                                '<div class="flex justify-between items-center mb-1 text-[10px]">' +
+                                    '<span class="text-slate-600 font-bold">Distance:</span>' +
+                                    '<div class="flex items-center gap-0.5">' +
+                                        '<input type="number" id="input-x-' + f.id + '" min="0" max="' + beamLength + '" step="0.1" value="' + f.x.toFixed(1) + '" ' +
+                                               'class="w-12 bg-white border border-blue-300 font-bold text-blue-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none" ' +
+                                               'oninput="updateForceParam(' + f.id + ', \'x\', this.value)">' +
+                                        '<span class="font-bold text-blue-600">m</span>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<input type="range" id="slider-x-' + f.id + '" min="0" max="' + beamLength + '" value="' + f.x + '" step="0.1" ' +
+                                       'class="w-full accent-blue-500 cursor-pointer" ' +
+                                       'oninput="updateForceParam(' + f.id + ', \'x\', this.value)">' +
+                            '</div>' +
+                        '</div>' +
+                        (isAngled ? 
+                            '<div class="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 flex justify-between font-mono-code font-bold">' +
+                                '<span>Perpendicular F<sub>&perp;</sub> = F sin(' + f.angle + '&deg;)</span>' +
+                                '<span>' + perpF + ' N</span>' +
+                            '</div>' : '') +
+                    '</div>';
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updatePhysics() {
+            let sortedForces = forces.slice().sort(function(a, b) { return a.x - b.x; });
+
+            let totalFy = 0;
+            let totalMA = 0; // Sum of moments of loads about Support A
+
+            sortedForces.forEach(function(f) {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1; // Downward = positive load
+
+                totalFy += dirSign * Fy;
+                totalMA += dirSign * Fy * (f.x - supportA);
+            });
+
+            // Distance between supports A and B
+            let supportDistance = supportB - supportA;
+            let RB = Math.abs(supportDistance) > 0.001 ? (totalMA / supportDistance) : 0;
+            let RA = totalFy - RB;
+
+            // Update UI Indicators
+            const lenBadge = document.getElementById('txt-beam-len-badge');
+            if (lenBadge) lenBadge.innerText = 'BEAM LENGTH L = ' + beamLength.toFixed(1) + ' m';
+
+            document.getElementById('metric-total-f').innerText = totalFy.toFixed(1) + ' N';
+            document.getElementById('metric-total-ma').innerText = totalMA.toFixed(1) + ' N·m';
+            document.getElementById('metric-ra').innerText = RA.toFixed(2) + ' N';
+            document.getElementById('metric-rb').innerText = RB.toFixed(2) + ' N';
+
+            const badge = document.getElementById('badge-equilibrium-status');
+            if (badge) {
+                badge.innerHTML = '<i class="fa-solid fa-scale-balanced text-emerald-600"></i> Reaction Forces: R<sub>A</sub> = ' + RA.toFixed(2) + ' N, R<sub>B</sub> = ' + RB.toFixed(2) + ' N';
+            }
+
+            renderTwoSupportsMathSteps(sortedForces, RA, RB, totalMA, totalFy, supportDistance);
+        }
+
+        function renderTwoSupportsMathSteps(sortedForces, RA, RB, totalMA, totalFy, supportDistance) {
+            const container = document.getElementById('math-steps-container');
+            if (!container) return;
+
+            let momentTermsA = sortedForces.map(function(f) {
+                let dirSign = f.dir === 'up' ? '-' : '';
+                let fStr = f.angle !== 90 ? '(' + f.F + '&middot;sin' + f.angle + '&deg;)' : '' + f.F;
+                let distA = (f.x - supportA).toFixed(1);
+                return '(' + dirSign + fStr + ')(' + distA + ')';
+            }).join(' + ');
+
+            let momentValsA = sortedForces.map(function(f) {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+                let distA = f.x - supportA;
+                return (dirSign * Fy * distA).toFixed(1);
+            }).join(' + ');
+
+            let distAB = supportDistance.toFixed(1);
+
+            let html = 
+                '<div class="bg-indigo-50/80 p-3 rounded-xl border border-indigo-200 space-y-1">' +
+                    '<div class="font-bold text-indigo-950">1. Moment Equilibrium about Support A (Σ; M<sub>A</sub> = 0):</div>' +
+                    '<div class="text-slate-800">' +
+                        'R<sub>B</sub> &middot; (x<sub>B</sub> - x<sub>A</sub>) = Sum of load moments about Support A' +
+                    '</div>' +
+                    '<div class="font-bold text-indigo-900 py-1 text-center bg-white/70 rounded border border-indigo-200">' +
+                        'R<sub>B</sub> &middot; (' + distAB + ' m) = &Sigma; [F<sub>&perp;,i</sub> &middot; (x<sub>i</sub> - x<sub>A</sub>)]' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">' +
+                    '<div class="font-bold text-blue-900">2. Expand Load Moments about Support A:</div>' +
+                    '<div class="text-slate-800 overflow-x-auto py-1">' +
+                        'R<sub>B</sub>(' + distAB + ') = ' + momentTermsA +
+                    '</div>' +
+                    '<div class="text-slate-800 overflow-x-auto py-1 font-bold">' +
+                        'R<sub>B</sub>(' + distAB + ') = ' + momentValsA + ' = ' + totalMA.toFixed(1) + ' N&middot;m' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="bg-purple-50/80 p-3 rounded-xl border border-purple-200 space-y-1">' +
+                    '<div class="font-bold text-purple-950">3. Solve for Reaction Force R<sub>B</sub>:</div>' +
+                    '<div class="text-slate-800">' +
+                        'R<sub>B</sub> = ' + totalMA.toFixed(1) + ' / ' + distAB +
+                    '</div>' +
+                    '<div class="text-purple-900 text-sm font-extrabold mt-1">' +
+                        'R<sub>B</sub> = <span class="bg-purple-200 px-2 py-0.5 rounded text-slate-950">' + RB.toFixed(2) + ' N</span>' +
+                    '</div>' +
+                '</div>' +
+
+                '<div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 space-y-1">' +
+                    '<div class="font-bold text-amber-950">4. Vertical Force Equilibrium (&Sigma; F<sub>y</sub> = 0):</div>' +
+                    '<div class="text-slate-800">' +
+                        'R<sub>A</sub> + R<sub>B</sub> = Total Downward Force (&Sigma; F<sub>y</sub> = ' + totalFy.toFixed(1) + ' N)' +
+                    '</div>' +
+                    '<div class="text-slate-800">' +
+                        'R<sub>A</sub> = ' + totalFy.toFixed(1) + ' - ' + RB.toFixed(2) +
+                    '</div>' +
+                    '<div class="text-amber-900 text-sm font-extrabold mt-1">' +
+                        'R<sub>A</sub> = <span class="bg-amber-200 px-2 py-0.5 rounded text-slate-950">' + RA.toFixed(2) + ' N</span>' +
+                    '</div>' +
+                '</div>';
+
+            container.innerHTML = html;
+        }
+
+        function animateLoop() {
+            drawCanvasScene();
+            requestAnimationFrame(animateLoop);
+        }
+
+        function drawCanvasScene() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const marginX = w * 0.12;
+            const beamWidthPx = w - marginX * 2;
+            const beamYPx = h * 0.44;
+
+            let sortedForces = forces.slice().sort(function(a, b) { return a.x - b.x; });
+
+            // 1. Distance Scale Ruler
+            const rulerY = h - 35;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(marginX, rulerY);
+            ctx.lineTo(marginX + beamWidthPx, rulerY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+
+            let step = beamLength <= 10 ? 2 : (beamLength <= 15 ? 3 : 4);
+            for (let i = 0; i <= beamLength; i += step) {
+                let markPx = marginX + (i / beamLength) * beamWidthPx;
+                ctx.beginPath();
+                ctx.moveTo(markPx, rulerY - 5);
+                ctx.lineTo(markPx, rulerY + 5);
+                ctx.stroke();
+                ctx.fillText(i + 'm', markPx, rulerY + 17);
+            }
+
+            // Beam End Labels (0m and L)
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'extrabold 13px "Plus Jakarta Sans"';
+            ctx.textAlign = 'right';
+            ctx.fillText('0m', marginX - 10, beamYPx + 5);
+            ctx.textAlign = 'left';
+            ctx.fillText(beamLength + 'm', marginX + beamWidthPx + 10, beamYPx + 5);
+
+            // 2. Yellow Beam
+            ctx.fillStyle = '#fef08a';
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.roundRect(marginX, beamYPx - 6, beamWidthPx, 12, 3);
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. Draw Triangular Supports A and B
+            const fulcrumHeight = 32;
+            const fulcrumWidth = 26;
+
+            let suppAPx = marginX + (supportA / beamLength) * beamWidthPx;
+            let suppBPx = marginX + (supportB / beamLength) * beamWidthPx;
+
+            // Support A (Blue Triangle)
+            ctx.fillStyle = '#2563eb';
+            ctx.strokeStyle = '#1d4ed8';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(suppAPx, beamYPx + 6);
+            ctx.lineTo(suppAPx - fulcrumWidth / 2, beamYPx + 6 + fulcrumHeight);
+            ctx.lineTo(suppAPx + fulcrumWidth / 2, beamYPx + 6 + fulcrumHeight);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'extrabold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('A', suppAPx, beamYPx + 6 + fulcrumHeight - 6);
+
+            // Support B (Purple Triangle)
+            ctx.fillStyle = '#7c3aed';
+            ctx.strokeStyle = '#6d28d9';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(suppBPx, beamYPx + 6);
+            ctx.lineTo(suppBPx - fulcrumWidth / 2, beamYPx + 6 + fulcrumHeight);
+            ctx.lineTo(suppBPx + fulcrumWidth / 2, beamYPx + 6 + fulcrumHeight);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'extrabold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('B', suppBPx, beamYPx + 6 + fulcrumHeight - 6);
+
+            // 4. Calculate Reaction Forces RA and RB
+            let totalFy = 0;
+            let totalMA = 0;
+            sortedForces.forEach(function(f) {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+                totalFy += dirSign * Fy;
+                totalMA += dirSign * Fy * (f.x - supportA);
+            });
+
+            let supportDistance = supportB - supportA;
+            let RB = Math.abs(supportDistance) > 0.001 ? (totalMA / supportDistance) : 0;
+            let RA = totalFy - RB;
+
+            // Draw Upward Reaction Force Arrows at Supports
+            drawReactionArrow(suppAPx, beamYPx + 6 + fulcrumHeight + 35, beamYPx + 6 + fulcrumHeight + 5, '#1d4ed8', 'R_A = ' + RA.toFixed(1) + 'N');
+            drawReactionArrow(suppBPx, beamYPx + 6 + fulcrumHeight + 35, beamYPx + 6 + fulcrumHeight + 5, '#6d28d9', 'R_B = ' + RB.toFixed(1) + 'N');
+
+            // 5. Force Staggering for Applied Loads
+            let forceOffsets = sortedForces.map(function(f, idx) {
+                let fPx = marginX + (f.x / beamLength) * beamWidthPx;
+                let arrowLen = Math.max((f.F / 100) * 45, 26);
+                return { id: f.id, originalIdx: idx, F: f.F, x: f.x, dir: f.dir || 'down', angle: f.angle || 90, fPx: fPx, arrowLen: arrowLen, labelYTier: 0 };
+            });
+
+            const minLabelDistancePx = 50;
+            for (let i = 1; i < forceOffsets.length; i++) {
+                let prev = forceOffsets[i - 1];
+                let curr = forceOffsets[i];
+                if (Math.abs(curr.fPx - prev.fPx) < minLabelDistancePx) {
+                    curr.labelYTier = (prev.labelYTier + 1) % 2;
+                }
+            }
+
+            // 6. Draw Applied Force Vectors ATTACHED TO BEAM SURFACE
+            forceOffsets.forEach(function(item) {
+                if (item.F <= 0) return; // Hide 0N default vectors for clean UI
+
+                let forcePx = item.fPx;
+                let arrowLen = item.arrowLen;
+                let labelExtraOffset = item.labelYTier * 18;
+                let isUp = item.dir === 'up';
+
+                let thetaRad = (item.angle * Math.PI) / 180;
+                let dx = arrowLen * Math.cos(thetaRad);
+                let dy = Math.max(arrowLen * Math.sin(thetaRad), 12);
+
+                // ATTACH TIP TO BEAM SURFACE
+                let endX = forcePx;
+                let endY = isUp ? (beamYPx + 6) : (beamYPx - 6);
+
+                let startX = forcePx + dx;
+                let startY = isUp ? (endY + dy + labelExtraOffset) : (endY - (dy + labelExtraOffset));
+
+                let color = isUp ? '#2563eb' : '#dc2626';
+
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2.8;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                let headAngle = Math.atan2(endY - startY, endX - startX);
+                const arrowHeadLen = 8;
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(endX - arrowHeadLen * Math.cos(headAngle - Math.PI / 6), endY - arrowHeadLen * Math.sin(headAngle - Math.PI / 6));
+                ctx.lineTo(endX - arrowHeadLen * Math.cos(headAngle + Math.PI / 6), endY - arrowHeadLen * Math.sin(headAngle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                // Force Badge
+                const labelText = 'F' + (item.originalIdx + 1) + ' = ' + item.F + 'N' + (item.angle !== 90 ? ' (' + item.angle + '°)' : '');
+                ctx.font = 'bold 10.5px "Plus Jakarta Sans"';
+                const metrics = ctx.measureText(labelText);
+                const padX = 4;
+                const labelY = startY + (isUp ? 14 : -6);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(startX - metrics.width / 2 - padX, labelY - 12, metrics.width + padX * 2, 14, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                ctx.textAlign = 'center';
+                ctx.fillText(labelText, startX, labelY - 2);
+            });
+
+            // 7. Interval Spacing Arrows (X1, X2, ...)
+            const showIntervalsEl = document.getElementById('chk-show-intervals');
+            const showIntervals = showIntervalsEl ? showIntervalsEl.checked : true;
+
+            if (showIntervals && forceOffsets.length > 1) {
+                const intervalY = beamYPx - 18;
+
+                for (let i = 0; i < forceOffsets.length - 1; i++) {
+                    let startPx = forceOffsets[i].fPx;
+                    let endPx = forceOffsets[i + 1].fPx;
+                    let distVal = Math.abs(forceOffsets[i + 1].x - forceOffsets[i].x);
+
+                    if (Math.abs(endPx - startPx) > 15) {
+                        ctx.strokeStyle = '#0284c7';
+                        ctx.fillStyle = '#0284c7';
+                        ctx.lineWidth = 1.2;
+
+                        ctx.beginPath();
+                        ctx.moveTo(startPx, intervalY);
+                        ctx.lineTo(endPx, intervalY);
+                        ctx.stroke();
+
+                        let arrowHead = 4;
+                        ctx.beginPath();
+                        ctx.moveTo(startPx, intervalY);
+                        ctx.lineTo(startPx + arrowHead, intervalY - 2.5);
+                        ctx.lineTo(startPx + arrowHead, intervalY + 2.5);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.moveTo(endPx, intervalY);
+                        ctx.lineTo(endPx - arrowHead, intervalY - 2.5);
+                        ctx.lineTo(endPx - arrowHead, intervalY + 2.5);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        let midPx = (startPx + endPx) / 2;
+                        let labelStr = 'X' + (i + 1) + ' = ' + distVal.toFixed(1) + 'm';
+                        ctx.font = 'bold 8.5px "Plus Jakarta Sans"';
+                        let textW = ctx.measureText(labelStr).width;
+
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.fillRect(midPx - textW / 2 - 2, intervalY - 4, textW + 4, 8);
+
+                        ctx.fillStyle = '#0369a1';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(labelStr, midPx, intervalY + 2);
+                    }
+                }
+            }
+        }
+
+        function drawReactionArrow(x, startY, endY, color, labelText) {
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(x, startY);
+            ctx.lineTo(x, endY);
+            ctx.stroke();
+
+            const headLen = 7;
+            ctx.beginPath();
+            ctx.moveTo(x, endY);
+            ctx.lineTo(x - headLen * 0.5, endY + headLen);
+            ctx.lineTo(x + headLen * 0.5, endY + headLen);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText(labelText, x, startY + 12);
+        }
+    </script>
+</body>
+</html>
