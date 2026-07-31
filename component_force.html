@@ -3,616 +3,643 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INTERACTIVE FORCE COMPONENT SIMULATOR</title>
-    
+    <title>Interactive Force Component Simulator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts: Plus Jakarta Sans, Fredoka, JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- KaTeX CDN for Math Rendering -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
-    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
         body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            background-color: #f5f2eb;
-            background-image: radial-gradient(#d5d1c8 1.2px, transparent 1.2px);
-            background-size: 20px 20px;
-            color: #1e293b;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0f4f9;
         }
         
         .font-heading {
             font-family: 'Fredoka', cursive, sans-serif;
         }
 
-        .font-mono-num {
+        .font-mono-code {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        canvas {
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
             touch-action: none;
         }
 
-        /* Custom shadow and card styling inspired by math illustration style */
-        .math-card {
-            background-color: #ffffff;
-            border: 2px solid #1e3a8a;
-            box-shadow: 4px 4px 0px #1e3a8a;
+        /* Smooth Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
-
-        .math-card-sm {
-            background-color: #ffffff;
-            border: 2px solid #334155;
-            box-shadow: 3px 3px 0px #334155;
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-
-        .math-btn {
-            border: 2px solid #1e3a8a;
-            box-shadow: 2px 2px 0px #1e3a8a;
-            transition: all 0.15s ease;
-        }
-
-        .math-btn:hover {
-            transform: translate(-1px, -1px);
-            box-shadow: 3px 3px 0px #1e3a8a;
-        }
-
-        .math-btn:active {
-            transform: translate(1px, 1px);
-            box-shadow: 1px 1px 0px #1e3a8a;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="min-h-screen pb-12 flex flex-col justify-between">
+<body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Header Section -->
-    <header class="bg-[#1d428a] text-white border-b-4 border-[#0f2852] py-4 px-4 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
-            <div class="flex items-center gap-3">
-                <div class="bg-[#f59e0b] text-[#1d428a] w-10 h-10 rounded-2xl flex items-center justify-center font-black text-xl border-2 border-white shadow">
-                    <i class="fa-solid fa-lightbulb"></i>
+    <!-- Top Header Banner (Matching reference design) -->
+    <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-yellow-400/20 p-2.5 rounded-xl border border-yellow-400/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-lightbulb text-xl text-yellow-400"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold font-heading tracking-wide flex items-center gap-2">
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide uppercase text-white flex items-center gap-2">
                         INTERACTIVE FORCE COMPONENT SIMULATOR
                     </h1>
-                    <p class="text-blue-100 text-xs font-medium">
-                        Resolve force vectors into horizontal (Fx) and vertical (Fy) components with real-time visualization.
-                    </p>
+                    <p class="text-[11px] text-slate-300">Resolve force vectors into horizontal (Fx) and vertical (Fy) components with real-time visualization.</p>
                 </div>
             </div>
             
-            <div class="flex items-center gap-2.5">
-                <!-- Max Force F_max Setting -->
-                <div class="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 px-3 py-1.5 rounded-2xl text-xs text-white shadow-inner">
-                    <label for="maxForceInput" class="font-extrabold text-amber-300">F<sub>max</sub>:</label>
-                    <input id="maxForceInput" type="number" min="10" max="1000" step="10" value="200" class="w-16 bg-white text-[#1d428a] border-2 border-[#1d428a] rounded-xl px-1.5 py-0.5 text-center font-mono-num font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    <span class="font-bold text-blue-200">N</span>
+            <!-- Right Actions & Header Widget -->
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Fmax Input Widget -->
+                <div class="bg-indigo-950/80 px-3 py-1.5 rounded-xl border border-indigo-700/50 flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-300 font-mono-code">F<sub>max</sub>:</span>
+                    <input type="number" id="input-fmax" value="200" min="50" max="1000" step="10" 
+                           class="w-16 bg-slate-900 border border-indigo-500/50 text-white font-bold text-xs px-2 py-1 rounded text-center focus:outline-none focus:ring-1 focus:ring-yellow-400 font-mono-code"
+                           onchange="updateFmax(this.value)">
+                    <span class="text-xs font-bold text-slate-400 font-mono-code">N</span>
                 </div>
 
                 <!-- Home Button -->
-                <a href="index.html" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold px-3.5 py-2 rounded-2xl border-2 border-[#1e40af] shadow-md transition flex items-center gap-1.5">
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
-                
-                <button id="resetBtn" class="bg-[#f43f5e] hover:bg-[#e11d48] text-white text-xs font-bold px-3.5 py-2 rounded-2xl border-2 border-[#881337] shadow-md transition flex items-center gap-1.5">
+
+                <!-- Reset Button -->
+                <button onclick="resetSimulator()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
                     <i class="fa-solid fa-rotate-right"></i> Reset
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content (Interactive Quadrants & Results) -->
-    <main class="max-w-4xl mx-auto px-4 w-full mt-6 space-y-6">
-
-        <!-- INTERACTIVE QUADRANT CANVAS SECTION -->
-        <section class="math-card rounded-3xl p-4 md:p-6 relative overflow-hidden">
+    <!-- Main Content Container: Side-by-Side Layout -->
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- Canvas Header -->
-            <div class="flex justify-between items-center mb-3 pb-2 border-b-2 border-slate-200">
-                <span class="font-heading text-[#1d428a] text-lg font-bold flex items-center gap-2">
-                    <i class="fa-solid fa-shapes text-[#f59e0b]"></i> Cartesian Plane & Quadrants
-                </span>
+            <!-- LEFT COLUMN (LG: COL-6): CARTESIAN PLANE & INTERACTIVE VECTOR CONTROL -->
+            <div class="lg:col-span-6 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <!-- Section Title -->
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-compass text-amber-500"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Cartesian Plane & Quadrants</h2>
+                        </div>
+                        <button id="btn-direction-toggle" onclick="toggleDirection()" 
+                                class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-700 font-bold text-xs px-3 py-1 rounded-lg transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-arrow-up-right-from-square text-indigo-600"></i> Direction: <span id="badge-direction-text" class="text-indigo-900 uppercase">OUTWARD (OUT)</span>
+                        </button>
+                    </div>
+
+                    <!-- Canvas Area -->
+                    <div class="canvas-container rounded-xl overflow-hidden h-[360px] sm:h-[400px] flex items-center justify-center relative cursor-crosshair">
+                        <canvas id="vectorCanvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Top-Left Quadrant Badge Overlay -->
+                        <div class="absolute top-3 left-3 bg-indigo-900/90 backdrop-blur-sm border border-indigo-700 text-white font-extrabold text-[11px] px-3 py-1 rounded-lg shadow-sm">
+                            <span id="overlay-quadrant-badge">QUADRANT I</span>
+                        </div>
+
+                        <!-- Reset View Button -->
+                        <button onclick="resetVectorToDefault()" class="absolute top-3 right-3 text-[11px] bg-white/90 hover:bg-white text-slate-700 px-2.5 py-1 rounded-lg font-bold border border-slate-200 shadow-sm transition flex items-center gap-1 cursor-pointer">
+                            <i class="fa-solid fa-crosshairs text-indigo-600"></i> Center Vector
+                        </button>
+                    </div>
+
+                    <!-- Interactive Drag Helper Text -->
+                    <div class="mt-2.5 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-600 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5 font-semibold text-[11px]">
+                            <i class="fa-solid fa-hand-pointer text-indigo-500"></i> Drag the arrow tip on canvas to adjust magnitude (F) & angle (𝝷).
+                        </span>
+                        <span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded text-[10px]">
+                            Interactive Canvas
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Manual Controls Panel -->
+                <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-3">
+                    <div class="font-bold text-slate-700 text-xs flex items-center justify-between border-b border-slate-200/60 pb-1.5">
+                        <span><i class="fa-solid fa-sliders text-indigo-600 mr-1"></i> Manual Vector Inputs</span>
+                    </div>
+
+                    <!-- Force Magnitude (F) Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label class="text-rose-600 font-bold flex items-center gap-1">
+                                Force Magnitude ($F$):
+                            </label>
+                            <span id="val-f-display" class="font-extrabold text-rose-600 font-mono-code">120.0 N</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="slider-f" min="0" max="200" value="120" step="1" 
+                                   class="w-full accent-rose-500 cursor-pointer" oninput="onSliderInputChange()">
+                        </div>
+                    </div>
+
+                    <!-- Angle (θ) Slider -->
+                    <div class="space-y-1">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label class="text-amber-600 font-bold flex items-center gap-1">
+                                Direction Angle ($\theta$):
+                            </label>
+                            <span id="val-theta-display" class="font-extrabold text-amber-600 font-mono-code">45.0°</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="range" id="slider-theta" min="0" max="360" value="45" step="0.5" 
+                                   class="w-full accent-amber-500 cursor-pointer" oninput="onSliderInputChange()">
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Canvas Wrapper -->
-            <div class="w-full bg-[#fdfbf7] rounded-2xl overflow-hidden relative shadow-inner border-2 border-slate-800 flex justify-center items-center">
-                <canvas id="quadrantCanvas" width="550" height="520" class="w-full max-w-full h-auto block cursor-grab active:cursor-grabbing"></canvas>
+            <!-- RIGHT COLUMN (LG: COL-6): FORCE CALCULATION RESULTS & STEP-BY-STEP DERIVATION -->
+            <div class="lg:col-span-6 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
                 
-                <!-- Floating Toggle Overlay (Direction IN / OUT) -->
-                <div class="absolute top-3 right-3 z-10">
-                    <button id="toggleDirBtn" onclick="toggleDirection()" class="math-btn bg-white hover:bg-slate-50 text-[#1d428a] px-3.5 py-2 rounded-2xl text-xs font-extrabold flex items-center gap-2 shadow-sm">
-                        <i id="dirIcon" class="fa-solid fa-arrow-up-right-from-square text-[#f59e0b] text-sm"></i>
-                        <span id="dirText">Direction: OUTWARD (OUT)</span>
-                    </button>
-                </div>
-
-                <!-- Floating Quad Badge -->
-                <div class="absolute top-3 left-3 z-10">
-                    <span id="currentQuadrantBadge" class="bg-[#1d428a] text-white border-2 border-slate-900 px-3.5 py-1.5 rounded-2xl text-xs font-black shadow-md font-heading tracking-wide">
-                        QUADRANT I
-                    </span>
-                </div>
-
-                <!-- Canvas Bottom Hint -->
-                <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur text-slate-800 text-[11px] md:text-xs px-3.5 py-2 rounded-2xl border-2 border-slate-800 flex items-center justify-between pointer-events-none shadow-md font-semibold">
-                    <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-hand-pointer text-[#1d428a] animate-bounce text-sm"></i> 
-                        Drag the arrow to rotate & adjust length of F. Double-tap/click arrow to toggle direction (pointing IN/OUT).
-                    </span>
-                </div>
-            </div>
-        </section>
-
-        <!-- RESULTS SECTION -->
-        <section class="math-card rounded-3xl p-5 md:p-6 space-y-5">
-            
-            <div class="flex items-center justify-between border-b-2 border-slate-200 pb-3">
-                <h2 class="text-lg md:text-xl font-bold font-heading text-[#1d428a] flex items-center gap-2">
-                    <i class="fa-solid fa-calculator text-[#0d9488]"></i> Force Calculation Results
-                </h2>
-                <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-xl border border-slate-300">
-                    Real-Time
-                </span>
-            </div>
-
-            <!-- Key Metric Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4">
-                
-                <!-- Fx -->
-                <div class="bg-blue-50/80 border-2 border-blue-600 p-4 rounded-2xl shadow-sm">
-                    <span class="text-blue-900 text-xs font-extrabold uppercase tracking-wider block">X-Component (Fx)</span>
-                    <div id="resultFx" class="text-xl md:text-2xl font-black text-blue-700 font-mono-num mt-1">
-                        +84.85 N
+                <!-- Calculation Results Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-square-poll-vertical text-emerald-600 text-lg"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Force Calculation Results</h2>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                            <i class="fa-solid fa-bolt text-emerald-600"></i> Real-time Output
+                        </span>
                     </div>
-                    <span id="directionFxText" class="text-xs font-bold text-blue-800 mt-1 block">Direction: Right (+X)</span>
+
+                    <!-- 2x2 Metric Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-4">
+                        
+                        <!-- Card 1: X-Component (Fx) -->
+                        <div class="bg-blue-50/60 border-2 border-blue-200 rounded-xl p-3.5 flex flex-col justify-between">
+                            <span class="text-[11px] font-bold text-blue-700 uppercase tracking-wider">X-COMPONENT (Fx)</span>
+                            <div id="metric-fx-val" class="text-2xl font-extrabold text-blue-900 my-1 font-mono-code">+84.85 N</div>
+                            <span id="metric-fx-dir" class="text-xs font-semibold text-blue-600">Direction: Right (+X)</span>
+                        </div>
+
+                        <!-- Card 2: Y-Component (Fy) -->
+                        <div class="bg-emerald-50/60 border-2 border-emerald-200 rounded-xl p-3.5 flex flex-col justify-between">
+                            <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Y-COMPONENT (Fy)</span>
+                            <div id="metric-fy-val" class="text-2xl font-extrabold text-emerald-900 my-1 font-mono-code">+84.85 N</div>
+                            <span id="metric-fy-dir" class="text-xs font-semibold text-emerald-600">Direction: Upward (+Y)</span>
+                        </div>
+
+                        <!-- Card 3: Resultant Force (Fr) -->
+                        <div class="bg-amber-50/60 border-2 border-amber-200 rounded-xl p-3.5 flex flex-col justify-between">
+                            <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">RESULTANT FORCE (FR)</span>
+                            <div id="metric-fr-val" class="text-2xl font-extrabold text-amber-900 my-1 font-mono-code">120.00 N</div>
+                            <span class="text-xs font-semibold text-amber-600">Magnitude of Vector Fr</span>
+                        </div>
+
+                        <!-- Card 4: Direction Angle (θ) -->
+                        <div class="bg-purple-50/60 border-2 border-purple-200 rounded-xl p-3.5 flex flex-col justify-between">
+                            <span class="text-[11px] font-bold text-purple-700 uppercase tracking-wider">DIRECTION ANGLE (&theta;)</span>
+                            <div id="metric-theta-val" class="text-2xl font-extrabold text-purple-900 my-1 font-mono-code">45.0°</div>
+                            <span id="metric-quadrant-tag" class="text-xs font-semibold text-purple-600 uppercase">QUADRANT I</span>
+                        </div>
+
+                    </div>
                 </div>
 
-                <!-- Fy -->
-                <div class="bg-teal-50/80 border-2 border-teal-600 p-4 rounded-2xl shadow-sm">
-                    <span class="text-teal-900 text-xs font-extrabold uppercase tracking-wider block">Y-Component (Fy)</span>
-                    <div id="resultFy" class="text-xl md:text-2xl font-black text-teal-700 font-mono-num mt-1">
-                        +84.85 N
+                <!-- Complete Step-by-Step Calculation Section -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">Complete Step-By-Step Calculation</h3>
                     </div>
-                    <span id="directionFyText" class="text-xs font-bold text-teal-800 mt-1 block">Direction: Upward (+Y)</span>
-                </div>
 
-                <!-- Fr -->
-                <div class="bg-amber-50/90 border-2 border-amber-600 p-4 rounded-2xl shadow-sm">
-                    <span class="text-amber-900 text-xs font-extrabold uppercase tracking-wider block">Resultant Force (Fr)</span>
-                    <div id="resultFr" class="text-xl md:text-2xl font-black text-amber-700 font-mono-num mt-1">
-                        120.00 N
+                    <div id="math-steps-container" class="space-y-2.5 font-mono-code text-xs">
+                        <!-- Dynamic Math Derivation injected via JS -->
                     </div>
-                    <span class="text-xs font-bold text-amber-800 mt-1 block">Magnitude of Vector Fr</span>
-                </div>
-
-                <!-- Theta -->
-                <div class="bg-purple-50/80 border-2 border-purple-600 p-4 rounded-2xl shadow-sm">
-                    <span class="text-purple-900 text-xs font-extrabold uppercase tracking-wider block">Direction Angle (𝝷)</span>
-                    <div id="resultTheta" class="text-xl md:text-2xl font-black text-purple-700 font-mono-num mt-1">
-                        45.0°
-                    </div>
-                    <span id="resultQuadrantName" class="text-xs font-extrabold text-purple-900 mt-1 block">QUADRANT I</span>
                 </div>
 
             </div>
 
-            <!-- Mathematical Step-by-Step Display -->
-            <div class="p-4 md:p-5 bg-[#fdfbf7] border-2 border-slate-800 rounded-2xl text-xs md:text-sm text-slate-800 shadow-sm space-y-3">
-                <span class="font-bold font-heading text-[#1d428a] text-base flex items-center gap-2 border-b border-slate-300 pb-2">
-                    <i class="fa-solid fa-list-check text-[#e05263]"></i> Complete Step-by-Step Calculation:
-                </span>
-                <div id="stepByStepContent" class="space-y-2.5 font-mono-num text-slate-900 font-semibold leading-relaxed">
-                    <!-- Dynamic calculations -->
-                </div>
-            </div>
-
-        </section>
+        </div>
 
     </main>
 
     <!-- Footer -->
-    <footer class="text-center text-xs font-bold text-slate-600 mt-8 py-2">
-        Force Component Simulator &bull; Unit Sains JMSK, PPD
+    <footer class="bg-[#0b1736] text-slate-400 py-3 text-center text-xs mt-auto border-t border-indigo-900/40">
+        <p>Interactive Force Component Simulator • Unit Sains JMSK, PPD</p>
     </footer>
 
-    <!-- JavaScript Simulator Engine -->
     <script>
-        // State Daya Tunggal (Single Force State)
-        let force = {
-            magnitude: 120,   // Magnitude in N
-            maxForce: 200,    // Max Magnitude in N
-            angle: 45,        // Line angle 0 - 360 degrees
-            direction: 'out' // 'out' (Pointing OUT) or 'in' (Pointing IN)
+        // --- SIMULATOR STATE ---
+        let config = {
+            fMax: 200,
+            F: 120,          // Force magnitude in Newtons
+            theta: 45,       // Angle in degrees (0 - 360)
+            isInward: false  // Outward by default
         };
 
+        // Canvas Interaction State
         let isDragging = false;
-        let lastTapTime = 0;
 
-        // DOM Elements
-        const canvas = document.getElementById('quadrantCanvas');
+        const canvas = document.getElementById('vectorCanvas');
         const ctx = canvas.getContext('2d');
-        const maxForceInput = document.getElementById('maxForceInput');
 
-        const resultFx = document.getElementById('resultFx');
-        const resultFy = document.getElementById('resultFy');
-        const resultFr = document.getElementById('resultFr');
-        const resultTheta = document.getElementById('resultTheta');
-        const resultQuadrantName = document.getElementById('resultQuadrantName');
-        const currentQuadrantBadge = document.getElementById('currentQuadrantBadge');
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            setupCanvasInteraction();
+            updateAll();
+        };
 
-        const directionFxText = document.getElementById('directionFxText');
-        const directionFyText = document.getElementById('directionFyText');
-        const stepByStepContent = document.getElementById('stepByStepContent');
-
-        const dirText = document.getElementById('dirText');
-        const dirIcon = document.getElementById('dirIcon');
-
-        // Helper KaTeX
-        function renderMath(latex) {
-            if (window.katex) {
-                return katex.renderToString(latex, { throwOnError: false });
-            }
-            return latex;
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawCanvas();
         }
 
-        // Listener for F_max change
-        maxForceInput.addEventListener('change', (e) => {
-            let val = parseFloat(e.target.value) || 200;
-            force.maxForce = Math.max(10, val);
-            if (force.magnitude > force.maxForce) {
-                force.magnitude = force.maxForce;
+        function updateFmax(val) {
+            let parsed = parseFloat(val);
+            if (isNaN(parsed) || parsed < 10) parsed = 100;
+            config.fMax = parsed;
+
+            const sliderF = document.getElementById('slider-f');
+            sliderF.max = config.fMax;
+            if (config.F > config.fMax) {
+                config.F = config.fMax;
+                sliderF.value = config.F;
             }
-            calculateAndUpdate();
-        });
+            updateAll();
+        }
 
-        // Reset Position
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            force.magnitude = 120;
-            force.maxForce = 200;
-            force.angle = 45;
-            force.direction = 'out';
-            maxForceInput.value = 200;
-            updateDirOverlayUI();
-            calculateAndUpdate();
-        });
-
-        // Toggle Direction (IN / OUT)
         function toggleDirection() {
-            force.direction = (force.direction === 'out') ? 'in' : 'out';
-            updateDirOverlayUI();
-            calculateAndUpdate();
+            config.isInward = !config.isInward;
+            document.getElementById('badge-direction-text').innerText = config.isInward ? "INWARD (IN)" : "OUTWARD (OUT)";
+            updateAll();
         }
 
-        function updateDirOverlayUI() {
-            if (force.direction === 'out') {
-                dirText.textContent = "Direction: OUTWARD (OUT)";
-                dirIcon.className = "fa-solid fa-arrow-up-right-from-square text-[#f59e0b]";
-            } else {
-                dirText.textContent = "Direction: INWARD (IN)";
-                dirIcon.className = "fa-solid fa-arrow-down-left-across-line text-[#f43f5e]";
-            }
+        function resetSimulator() {
+            config.fMax = 200;
+            config.F = 120;
+            config.theta = 45;
+            config.isInward = false;
+
+            document.getElementById('input-fmax').value = 200;
+            document.getElementById('slider-f').max = 200;
+            document.getElementById('slider-f').value = 120;
+            document.getElementById('slider-theta').value = 45;
+            document.getElementById('badge-direction-text').innerText = "OUTWARD (OUT)";
+
+            updateAll();
         }
 
-        function getQuadrantName(fx, fy) {
-            if (fx >= 0 && fy >= 0) return "QUADRANT I";
-            if (fx < 0 && fy >= 0) return "QUADRANT II";
-            if (fx < 0 && fy < 0) return "QUADRANT III";
+        function resetVectorToDefault() {
+            config.F = 120;
+            config.theta = 45;
+            document.getElementById('slider-f').value = 120;
+            document.getElementById('slider-theta').value = 45;
+            updateAll();
+        }
+
+        function onSliderInputChange() {
+            config.F = parseFloat(document.getElementById('slider-f').value) || 0;
+            config.theta = parseFloat(document.getElementById('slider-theta').value) || 0;
+            updateAll();
+        }
+
+        function getQuadrant(deg) {
+            deg = ((deg % 360) + 360) % 360;
+            if (deg >= 0 && deg < 90) return "QUADRANT I";
+            if (deg >= 90 && deg < 180) return "QUADRANT II";
+            if (deg >= 180 && deg < 270) return "QUADRANT III";
             return "QUADRANT IV";
         }
 
-        // Calculation & Main Updates
-        function calculateAndUpdate() {
-            let angleRad = force.angle * (Math.PI / 180);
-            let angleDeg = force.angle;
+        function updateAll() {
+            // Calculate components
+            let rad = (config.theta * Math.PI) / 180;
+            
+            // Outward vs Inward multiplier
+            let directionMultiplier = config.isInward ? -1 : 1;
 
-            // Fx and Fy components calculated directly based on the quadrant line angle
-            const fx = force.magnitude * Math.cos(angleRad);
-            const fy = force.magnitude * Math.sin(angleRad);
+            let Fx = config.F * Math.cos(rad) * directionMultiplier;
+            let Fy = config.F * Math.sin(rad) * directionMultiplier;
 
-            const Fr = Math.sqrt(fx * fx + fy * fy);
-            const quadrant = getQuadrantName(fx, fy);
+            let quadrantStr = getQuadrant(config.theta);
 
-            const thetaRefX = Math.abs(Math.atan(fy / (fx || 0.000001)) * (180 / Math.PI));
+            // Update Input Slider Value Displays
+            document.getElementById('val-f-display').innerText = `${config.F.toFixed(1)} N`;
+            document.getElementById('val-theta-display').innerText = `${config.theta.toFixed(1)}°`;
+            document.getElementById('overlay-quadrant-badge').innerText = quadrantStr;
 
-            // Update Result Cards
-            resultFx.textContent = `${fx >= 0 ? '+' : ''}${fx.toFixed(2)} N`;
-            resultFx.className = `text-xl md:text-2xl font-black font-mono-num ${fx >= 0 ? 'text-blue-700' : 'text-rose-600'}`;
-            directionFxText.textContent = `Direction: ${fx >= 0 ? 'Right (+X)' : 'Left (-X)'}`;
+            // Update 4 Metric Cards
+            document.getElementById('metric-fx-val').innerText = `${Fx >= 0 ? '+' : ''}${Fx.toFixed(2)} N`;
+            document.getElementById('metric-fx-dir').innerText = `Direction: ${Fx >= 0 ? 'Right (+X)' : 'Left (-X)'}`;
 
-            resultFy.textContent = `${fy >= 0 ? '+' : ''}${fy.toFixed(2)} N`;
-            resultFy.className = `text-xl md:text-2xl font-black font-mono-num ${fy >= 0 ? 'text-teal-700' : 'text-rose-600'}`;
-            directionFyText.textContent = `Direction: ${fy >= 0 ? 'Upward (+Y)' : 'Downward (-Y)'}`;
+            document.getElementById('metric-fy-val').innerText = `${Fy >= 0 ? '+' : ''}${Fy.toFixed(2)} N`;
+            document.getElementById('metric-fy-dir').innerText = `Direction: ${Fy >= 0 ? 'Upward (+Y)' : 'Downward (-Y)'}`;
 
-            resultFr.textContent = `${Fr.toFixed(2)} N`;
-            resultTheta.textContent = `${angleDeg.toFixed(1)}°`;
-            resultQuadrantName.textContent = quadrant;
-            currentQuadrantBadge.textContent = quadrant;
+            document.getElementById('metric-fr-val').innerText = `${config.F.toFixed(2)} N`;
+            document.getElementById('metric-theta-val').innerText = `${config.theta.toFixed(1)}°`;
+            document.getElementById('metric-quadrant-tag').innerText = quadrantStr;
 
-            // Step-by-Step Calculation Steps
-            stepByStepContent.innerHTML = `
-                <div class="bg-white p-2.5 rounded-xl border border-slate-300"><strong>1. X-Axis Component (${renderMath('F_x')}):</strong><br>
-                    ${renderMath(`F_x = F \\cdot \\cos(\\theta) = ${Math.round(force.magnitude)}\\text{ N} \\cdot \\cos(${angleDeg.toFixed(1)}^\\circ) = \\mathbf{${fx >= 0 ? '+' : ''}${fx.toFixed(2)}\\text{ N}}`)} (${fx >= 0 ? 'To the Right' : 'To the Left'})
+            // Update Step-by-Step Derivation Cards
+            renderMathSteps(Fx, Fy, quadrantStr);
+
+            // Redraw Canvas
+            drawCanvas();
+        }
+
+        function renderMathSteps(Fx, Fy, quadrantStr) {
+            const container = document.getElementById('math-steps-container');
+            
+            let thetaRad = (config.theta * Math.PI) / 180;
+            let cosVal = Math.cos(thetaRad).toFixed(4);
+            let sinVal = Math.sin(thetaRad).toFixed(4);
+
+            let dirFxStr = Fx >= 0 ? "To the Right" : "To the Left";
+            let dirFyStr = Fy >= 0 ? "Upward" : "Downward";
+
+            let refAngle = Math.abs(config.theta % 90);
+            if ((config.theta >= 90 && config.theta < 180) || (config.theta >= 270 && config.theta < 360)) {
+                refAngle = 90 - refAngle;
+            }
+
+            let html = `
+                <!-- Step 1: X-Axis Component -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-blue-900">1. X-Axis Component (F<sub>x</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>x</sub> = F · cos(&theta;) = ${config.F.toFixed(1)} N · cos(${config.theta.toFixed(1)}°) 
+                        = <strong class="text-blue-700">${Fx >= 0 ? '+' : ''}${Fx.toFixed(2)} N</strong> (${dirFxStr})
+                    </div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-slate-300"><strong>2. Y-Axis Component (${renderMath('F_y')}):</strong><br>
-                    ${renderMath(`F_y = F \\cdot \\sin(\\theta) = ${Math.round(force.magnitude)}\\text{ N} \\cdot \\sin(${angleDeg.toFixed(1)}^\\circ) = \\mathbf{${fy >= 0 ? '+' : ''}${fy.toFixed(2)}\\text{ N}}`)} (${fy >= 0 ? 'Upward' : 'Downward'})
+
+                <!-- Step 2: Y-Axis Component -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-emerald-900">2. Y-Axis Component (F<sub>y</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>y</sub> = F · sin(&theta;) = ${config.F.toFixed(1)} N · sin(${config.theta.toFixed(1)}°) 
+                        = <strong class="text-emerald-700">${Fy >= 0 ? '+' : ''}${Fy.toFixed(2)} N</strong> (${dirFyStr})
+                    </div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-slate-300"><strong>3. Resultant Force (${renderMath('F_r')}):</strong><br>
-                    ${renderMath(`F_r = \\sqrt{F_x^2 + F_y^2} = \\sqrt{(${fx.toFixed(2)})^2 + (${fy.toFixed(2)})^2} = \\mathbf{${Fr.toFixed(2)}\\text{ N}}`)}
+
+                <!-- Step 3: Resultant Force Magnitude -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-amber-900">3. Resultant Force Magnitude (F<sub>R</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>R</sub> = &radic;[F<sub>x</sub>&sup2; + F<sub>y</sub>&sup2;] 
+                        = &radic;[(${Fx.toFixed(2)})&sup2; + (${Fy.toFixed(2)})&sup2;] 
+                        = <strong class="text-amber-700">${config.F.toFixed(2)} N</strong>
+                    </div>
                 </div>
-                <div class="bg-white p-2.5 rounded-xl border border-slate-300"><strong>4. Direction Angle (${renderMath('\\theta')}):</strong><br>
-                    X-Axis Reference Angle = ${renderMath(`\\tan^{-1}\\left|\\frac{F_y}{F_x}\\right| = \\tan^{-1}\\left|\\frac{${fy.toFixed(2)}}{${fx.toFixed(2)}}\\right| = \\mathbf{${thetaRefX.toFixed(1)}^\\circ}`)} (${quadrant})<br>
-                    Standard Angle (Counter-Clockwise from +X) = ${renderMath(`\\mathbf{${angleDeg.toFixed(1)}^\\circ}`)}
+
+                <!-- Step 4: Direction Angle -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-purple-900">4. Direction Angle (&theta;):</div>
+                    <div class="text-slate-800">
+                        X-Axis Reference Angle = tan<sup>-1</sup>|F<sub>y</sub> / F<sub>x</sub>| 
+                        = tan<sup>-1</sup>|${Math.abs(Fy).toFixed(2)} / ${Math.abs(Fx).toFixed(2)}| 
+                        = <strong class="text-purple-700">${refAngle.toFixed(1)}°</strong> (${quadrantStr})
+                    </div>
+                    <div class="text-[11px] text-slate-500 italic mt-0.5">
+                        Standard Angle (Counter-Clockwise from +X) = <strong class="text-purple-800">${config.theta.toFixed(1)}°</strong>
+                    </div>
                 </div>
             `;
 
-            // Draw Canvas
-            drawCanvas(fx, fy, Fr, angleDeg, angleRad);
+            container.innerHTML = html;
         }
 
-        // Draw Canvas Graphics
-        function drawCanvas(fx, fy, Fr, angleDeg, angleRad) {
-            const width = canvas.width;
-            const height = canvas.height;
-            const centerX = width / 2;
-            const centerY = height / 2;
-            const maxRadius = Math.min(width, height) / 2 - 50;
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.clearRect(0, 0, width, height);
+            const originX = canvas.width / 2;
+            const originY = canvas.height / 2;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
 
-            // 1. Math Paper Grid Background Style
+            // 1. Draw Concentric Polar Grid Circles
             ctx.strokeStyle = '#e2e8f0';
             ctx.lineWidth = 1;
-            const gridSize = 25;
-            for (let x = 0; x < width; x += gridSize) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
-            }
-            for (let y = 0; y < height; y += gridSize) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
+            for (let r = 0.25; r <= 1.0; r += 0.25) {
+                ctx.beginPath();
+                ctx.arc(originX, originY, maxRadius * r, 0, Math.PI * 2);
+                ctx.stroke();
             }
 
-            // 2. Quadrant Circles & Grid Rings
-            ctx.strokeStyle = '#cbd5e1';
-            ctx.lineWidth = 2;
+            // 2. Draw Main Cartesian Axes (+X, -X, +Y, -Y)
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.8;
 
+            // X-Axis
             ctx.beginPath();
-            ctx.arc(centerX, centerY, maxRadius, 0, Math.PI * 2);
+            ctx.moveTo(30, originY);
+            ctx.lineTo(canvas.width - 30, originY);
             ctx.stroke();
 
+            // Y-Axis
             ctx.beginPath();
-            ctx.arc(centerX, centerY, maxRadius * 0.5, 0, Math.PI * 2);
+            ctx.moveTo(originX, 30);
+            ctx.lineTo(originX, canvas.height - 30);
             ctx.stroke();
-
-            // 3. Cartesian Axes (X & Y)
-            ctx.strokeStyle = '#1e3a8a';
-            ctx.lineWidth = 2.5;
-
-            ctx.beginPath(); ctx.moveTo(20, centerY); ctx.lineTo(width - 20, centerY); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(centerX, 20); ctx.lineTo(centerX, height - 20); ctx.stroke();
 
             // Axis Labels
-            ctx.fillStyle = '#1e3a8a';
-            ctx.font = 'bold 13px "Plus Jakarta Sans", sans-serif';
-            ctx.fillText('+X (0°)', width - 65, centerY - 10);
-            ctx.fillText('-X (180°)', 10, centerY - 10);
-            ctx.fillText('+Y (90°)', centerX + 10, 25);
-            ctx.fillText('-Y (270°)', centerX + 10, height - 10);
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'left';
+            ctx.fillText('+X (0°)', canvas.width - 65, originY - 8);
+            ctx.textAlign = 'right';
+            ctx.fillText('-X (180°)', 70, originY - 8);
+            ctx.textAlign = 'center';
+            ctx.fillText('+Y (90°)', originX + 28, 25);
+            ctx.fillText('-Y (270°)', originX + 30, canvas.height - 15);
 
-            // Quadrant Background Watermarks
-            ctx.font = 'bold 16px "Fredoka", sans-serif';
-            ctx.fillStyle = 'rgba(30, 58, 138, 0.08)';
-            ctx.fillText('QUADRANT I', centerX + maxRadius * 0.35, centerY - maxRadius * 0.45);
-            ctx.fillText('QUADRANT II', centerX - maxRadius * 0.85, centerY - maxRadius * 0.45);
-            ctx.fillText('QUADRANT III', centerX - maxRadius * 0.85, centerY + maxRadius * 0.55);
-            ctx.fillText('QUADRANT IV', centerX + maxRadius * 0.35, centerY + maxRadius * 0.55);
+            // Quadrant Labels in Faint Gray
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.font = 'extrabold 16px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('QUADRANT I', originX + maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT II', originX - maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT III', originX - maxRadius * 0.6, originY + maxRadius * 0.6);
+            ctx.fillText('QUADRANT IV', originX + maxRadius * 0.6, originY + maxRadius * 0.6);
 
-            // Scale arrow length based on F_max
-            const scale = maxRadius / force.maxForce;
-            const lenPixel = Math.max(10, Math.min(maxRadius, force.magnitude * scale));
+            // 3. Vector Mathematics to Canvas Pixels
+            let scale = maxRadius / config.fMax;
+            let vectorLenPx = config.F * scale;
+            let rad = (config.theta * Math.PI) / 180;
 
-            let startX, startY, endX, endY;
+            let directionMultiplier = config.isInward ? -1 : 1;
 
-            const outerX = centerX + lenPixel * Math.cos(angleRad);
-            const outerY = centerY - lenPixel * Math.sin(angleRad);
+            let vecX = vectorLenPx * Math.cos(rad) * directionMultiplier;
+            let vecY = -vectorLenPx * Math.sin(rad) * directionMultiplier; // Canvas Y inverted
 
-            if (force.direction === 'out') {
-                startX = centerX;
-                startY = centerY;
-                endX = outerX;
-                endY = outerY;
-            } else {
-                startX = outerX;
-                startY = outerY;
-                endX = centerX;
-                endY = centerY;
-            }
+            let tipX = originX + vecX;
+            let tipY = originY + vecY;
 
-            // 4. Component Vectors Fx & Fy on Canvas
-            const tipX = centerX + fx * scale;
-            const tipY = centerY - fy * scale;
+            // 4. Draw Vector Components (Fx & Fy) Dashed Triangles
+            let compXx = originX + vecX;
+            let compXy = originY;
 
-            // Dashed Projection Lines
-            ctx.setLineDash([5, 5]);
-            ctx.strokeStyle = '#94a3b8';
-            ctx.lineWidth = 1.5;
-
-            ctx.beginPath(); ctx.moveTo(tipX, centerY); ctx.lineTo(tipX, tipY); ctx.stroke();
-            ctx.beginPath(); ctx.moveTo(centerX, tipY); ctx.lineTo(tipX, tipY); ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Fx Arrow (Blue on X-Axis)
-            if (Math.abs(fx) > 1) {
-                drawArrow(ctx, centerX, centerY, tipX, centerY, '#1d428a', 3.5);
-                ctx.fillStyle = '#1d428a';
-                ctx.font = 'bold 12px "JetBrains Mono", monospace';
-                ctx.fillText(`Fx = ${fx.toFixed(1)}N`, centerX + (fx * scale) / 2 - 28, centerY + (fy >= 0 ? 20 : -12));
-            }
-
-            // Fy Arrow (Teal on Y-Axis)
-            if (Math.abs(fy) > 1) {
-                drawArrow(ctx, centerX, centerY, centerX, tipY, '#0d9488', 3.5);
-                ctx.fillStyle = '#0d9488';
-                ctx.font = 'bold 12px "JetBrains Mono", monospace';
-                ctx.fillText(`Fy = ${fy.toFixed(1)}N`, centerX + (fx >= 0 ? -75 : 12), centerY - (fy * scale) / 2);
-            }
-
-            // 5. Main Line & Force Vector Arrow F
-            const vectorColor = (force.direction === 'out') ? '#e05263' : '#d97706';
-            drawArrow(ctx, startX, startY, endX, endY, isDragging ? '#9333ea' : vectorColor, isDragging ? 5.5 : 4.5);
-
-            // Interactive Drag Handle Dot
-            ctx.beginPath();
-            ctx.arc(outerX, outerY, isDragging ? 11 : 8, 0, Math.PI * 2);
-            ctx.fillStyle = isDragging ? '#ffffff' : vectorColor;
-            ctx.strokeStyle = '#1e3a8a';
-            ctx.lineWidth = 3;
-            ctx.fill(); ctx.stroke();
-
-            // Label Force F on Vector Line
-            ctx.fillStyle = isDragging ? '#7e22ce' : vectorColor;
-            ctx.font = 'bold 14px "Fredoka", cursive, sans-serif';
-            const labelX = outerX + (Math.cos(angleRad) >= 0 ? 12 : -90);
-            const labelY = outerY + (Math.sin(angleRad) >= 0 ? -12 : 26);
-            ctx.fillText(`F = ${Math.round(force.magnitude)} N`, labelX, labelY);
-
-            // Angle Arc Theta & Angle Label
-            const arcRadius = 45;
-            ctx.strokeStyle = '#d97706';
+            // Fx Component Line (Green along horizontal)
+            ctx.strokeStyle = '#10b981';
             ctx.lineWidth = 2.5;
             ctx.beginPath();
-            ctx.arc(centerX, centerY, arcRadius, 0, -angleDeg * (Math.PI / 180), true);
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(compXx, compXy);
             ctx.stroke();
 
-            // Theta Label placed near Angle Arc
-            const midAngleRad = (angleRad / 2);
-            const arcTextX = centerX + (arcRadius + 20) * Math.cos(midAngleRad);
-            const arcTextY = centerY - (arcRadius + 20) * Math.sin(midAngleRad);
+            // Fy Component Line (Teal dashed along vertical projection)
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 4]);
+            ctx.beginPath();
+            ctx.moveTo(compXx, compXy);
+            ctx.lineTo(tipX, tipY);
+            ctx.stroke();
+            ctx.setLineDash([]);
 
-            ctx.fillStyle = '#b45309';
-            ctx.font = 'bold 13px "JetBrains Mono", monospace';
-            ctx.fillText(`θ = ${Math.round(angleDeg)}°`, arcTextX - 18, arcTextY);
-        }
+            // Component Labels
+            let calcFx = config.F * Math.cos(rad) * directionMultiplier;
+            let calcFy = config.F * Math.sin(rad) * directionMultiplier;
 
-        // Helper Function to Draw Arrows
-        function drawArrow(ctx, fromx, fromy, tox, toy, color, width) {
-            const headlen = 13;
-            const dx = tox - fromx;
-            const dy = toy - fromy;
-            const angle = Math.atan2(dy, dx);
+            ctx.font = 'bold 11px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#059669';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Fx = ${Math.abs(calcFx).toFixed(1)}N`, originX + vecX / 2, originY + (vecY >= 0 ? 18 : -10));
 
-            ctx.strokeStyle = color;
-            ctx.fillStyle = color;
-            ctx.lineWidth = width;
+            ctx.fillStyle = '#0284c7';
+            ctx.textAlign = vecX >= 0 ? 'left' : 'right';
+            ctx.fillText(`Fy = ${Math.abs(calcFy).toFixed(1)}N`, compXx + (vecX >= 0 ? 10 : -10), originY + vecY / 2);
+
+            // 5. Draw Angle Arc (θ)
+            let arcRadius = Math.min(38, vectorLenPx * 0.5);
+            if (arcRadius > 10) {
+                ctx.strokeStyle = '#d97706';
+                ctx.fillStyle = 'rgba(217, 119, 6, 0.12)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(originX, originY);
+                ctx.arc(originX, originY, arcRadius, 0, -rad, config.theta > 0);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+
+                // Angle Text
+                let midRad = rad / 2;
+                let textRadius = arcRadius + 16;
+                let arcTextX = originX + textRadius * Math.cos(midRad);
+                let arcTextY = originY - textRadius * Math.sin(midRad);
+
+                ctx.fillStyle = '#b45309';
+                ctx.font = 'extrabold 11px "Plus Jakarta Sans"';
+                ctx.textAlign = 'center';
+                ctx.fillText(`θ = ${config.theta.toFixed(0)}°`, arcTextX, arcTextY);
+            }
+
+            // 6. Draw Main Vector Arrow (F)
+            ctx.strokeStyle = '#dc2626'; // Red color
+            ctx.fillStyle = '#dc2626';
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
 
             ctx.beginPath();
-            ctx.moveTo(fromx, fromy);
-            ctx.lineTo(tox, toy);
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(tipX, tipY);
             ctx.stroke();
 
+            // Arrowhead
+            let arrowAngle = Math.atan2(tipY - originY, tipX - originX);
+            let headLen = 12;
+
             ctx.beginPath();
-            ctx.moveTo(tox, toy);
-            ctx.lineTo(tox - headlen * Math.cos(angle - Math.PI / 6), toy - headlen * Math.sin(angle - Math.PI / 6));
-            ctx.lineTo(tox - headlen * Math.cos(angle + Math.PI / 6), toy - headlen * Math.sin(angle + Math.PI / 6));
+            ctx.moveTo(tipX, tipY);
+            ctx.lineTo(tipX - headLen * Math.cos(arrowAngle - Math.PI / 6), tipY - headLen * Math.sin(arrowAngle - Math.PI / 6));
+            ctx.lineTo(tipX - headLen * Math.cos(arrowAngle + Math.PI / 6), tipY - headLen * Math.sin(arrowAngle + Math.PI / 6));
             ctx.closePath();
             ctx.fill();
+
+            // Interactive Draggable Node Circle at Tip
+            ctx.fillStyle = '#991b1b';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(tipX, tipY, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Vector F Main Label
+            ctx.font = 'extrabold 13px "Plus Jakarta Sans"';
+            ctx.fillStyle = '#dc2626';
+            ctx.textAlign = 'center';
+            ctx.fillText(`F = ${config.F.toFixed(0)} N`, tipX + (vecX >= 0 ? 25 : -25), tipY + (vecY >= 0 ? 18 : -12));
         }
 
-        // Dragging Event Handlers for Rotating & Scaling Force Directly
-        function setupCanvasEvents() {
-            function getCoords(e) {
-                const rect = canvas.getBoundingClientRect();
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-
-                return {
-                    x: (clientX - rect.left) * scaleX,
-                    y: (clientY - rect.top) * scaleY
-                };
-            }
-
-            function handleStart(e) {
-                const coords = getCoords(e);
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
-
-                const dx = coords.x - centerX;
-                const dy = -(coords.y - centerY);
-
-                // Double click / Double tap check to toggle IN / OUT direction
-                const now = Date.now();
-                if (now - lastTapTime < 300) {
-                    toggleDirection();
-                    lastTapTime = 0;
-                    return;
-                }
-                lastTapTime = now;
-
-                const dist = Math.hypot(dx, dy);
-                if (dist > 10) { 
-                    isDragging = true;
-                    updateForceFromPos(dx, dy);
-                }
-            }
-
-            function handleMove(e) {
+        function setupCanvasInteraction() {
+            function handlePointerMove(e) {
                 if (!isDragging) return;
-                const coords = getCoords(e);
-                const centerX = canvas.width / 2;
-                const centerY = canvas.height / 2;
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
 
-                const dx = coords.x - centerX;
-                const dy = -(coords.y - centerY);
+                const originX = canvas.width / 2;
+                const originY = canvas.height / 2;
 
-                updateForceFromPos(dx, dy);
-            }
+                const dx = mouseX - originX;
+                const dy = originY - mouseY; // Invert Y
 
-            function updateForceFromPos(dx, dy) {
+                // Calculate angle in degrees
                 let angleRad = Math.atan2(dy, dx);
-                let angleDeg = (angleRad * (180 / Math.PI) + 360) % 360;
+                let angleDeg = (angleRad * 180) / Math.PI;
+                if (angleDeg < 0) angleDeg += 360;
 
-                force.angle = Math.round(angleDeg);
+                // Calculate magnitude
+                const distPx = Math.sqrt(dx * dx + dy * dy);
+                const maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
+                let calculatedF = (distPx / maxRadius) * config.fMax;
 
-                // Adjust length / magnitude F based on F_max
-                const maxRadius = Math.min(canvas.width, canvas.height) / 2 - 50;
-                const scale = maxRadius / force.maxForce;
-                const distPixel = Math.hypot(dx, dy);
-                let newMag = Math.round(distPixel / scale);
-                force.magnitude = Math.max(0, Math.min(force.maxForce, newMag));
+                calculatedF = Math.max(0, Math.min(config.fMax, calculatedF));
 
-                calculateAndUpdate();
+                config.F = Math.round(calculatedF);
+                config.theta = Math.round(angleDeg * 2) / 2; // round to 0.5 deg
+
+                document.getElementById('slider-f').value = config.F;
+                document.getElementById('slider-theta').value = config.theta;
+
+                updateAll();
             }
 
-            function handleEnd() {
-                if (isDragging) {
-                    isDragging = false;
-                    calculateAndUpdate();
-                }
-            }
+            canvas.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                handlePointerMove(e);
+            });
 
-            canvas.addEventListener('mousedown', handleStart);
-            window.addEventListener('mousemove', handleMove);
-            window.addEventListener('mouseup', handleEnd);
+            window.addEventListener('mousemove', handlePointerMove);
+            window.addEventListener('mouseup', () => { isDragging = false; });
 
-            canvas.addEventListener('touchstart', (e) => { handleStart(e); e.preventDefault(); }, { passive: false });
-            window.addEventListener('touchmove', (e) => { handleMove(e); }, { passive: false });
-            window.addEventListener('touchend', handleEnd);
+            // Touch events
+            canvas.addEventListener('touchstart', (e) => {
+                isDragging = true;
+                if (e.touches.length > 0) handlePointerMove(e.touches[0]);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length > 0) handlePointerMove(e.touches[0]);
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => { isDragging = false; });
         }
-
-        // Initialization
-        window.addEventListener('DOMContentLoaded', () => {
-            calculateAndUpdate();
-            setupCanvasEvents();
-        });
     </script>
 </body>
 </html>
