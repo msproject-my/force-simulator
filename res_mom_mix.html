@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Method 2: Resultant Moment of Force Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            touch-action: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation Banner -->
+    <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-400/20 p-2.5 rounded-xl border border-amber-400/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-calculator text-xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide uppercase text-white flex items-center gap-2">
+                        RESULTANT MOMENT OF FORCE SIMULATOR
+                    </h1>
+                    <p class="text-[11px] text-slate-300">Method 2: Determine Center of Gravity (x) using Resultant Moment of Force</p>
+                </div>
+            </div>
+            
+            <!-- Actions Widget -->
+            <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <!-- Method Switch Button -->
+                <a href="moment_of_force.html" class="bg-indigo-800 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm border border-indigo-600">
+                    <i class="fa-solid fa-arrows-to-dot"></i> Method 1
+                </a>
+
+                <!-- Home Button -->
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+
+                <!-- Reset Button -->
+                <button onclick="resetSimulator()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container: Side-by-Side Layout -->
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- LEFT COLUMN (LG: COL-7): VISUAL BEAM CANVAS & STEP-BY-STEP ALGEBRA -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <!-- Section Header -->
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-amber-500"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Visual Beam System & Center of Gravity</h2>
+                        </div>
+                        <span id="badge-cog-status" class="bg-amber-100 text-amber-900 font-extrabold text-[11px] px-3 py-1 rounded-lg border border-amber-300 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-amber-600"></i> CoG Position (x = 5.33 m)
+                        </span>
+                    </div>
+
+                    <!-- Canvas Interactive Beam -->
+                    <div class="canvas-container rounded-xl overflow-hidden h-[340px] sm:h-[380px] flex items-center justify-center relative">
+                        <canvas id="beamCanvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Top-Left Datum Legend Overlay -->
+                        <div id="overlay-datum-badge" class="absolute top-3 left-3 bg-indigo-900/90 backdrop-blur-sm border border-indigo-700 text-white font-extrabold text-[11px] px-3 py-1 rounded-lg shadow-sm">
+                            <span>REFERENCE POINT A (x = 0.0 m)</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Helper Metric Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 text-center">
+                        <div class="bg-blue-50/70 border border-blue-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-blue-700 font-bold block uppercase">Total Force (Σ F)</span>
+                            <span id="metric-total-f" class="text-xs sm:text-sm font-extrabold text-blue-900 font-mono-code">60.0 N</span>
+                        </div>
+                        <div class="bg-emerald-50/70 border border-emerald-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-emerald-700 font-bold block uppercase">Sum of Moments (Σ M)</span>
+                            <span id="metric-total-m" class="text-xs sm:text-sm font-extrabold text-emerald-900 font-mono-code">320.0 N·m</span>
+                        </div>
+                        <div class="bg-amber-50/70 border border-amber-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-amber-700 font-bold block uppercase">Calculated CoG (x)</span>
+                            <span id="metric-cog" class="text-xs sm:text-sm font-extrabold text-amber-900 font-mono-code">5.33 m</span>
+                        </div>
+                        <div class="bg-purple-50/70 border border-purple-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-purple-700 font-bold block uppercase">Resultant Moment</span>
+                            <span id="metric-res-moment" class="text-xs sm:text-sm font-extrabold text-purple-900 font-mono-code">60x N·m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method 2 Step-by-Step Derivation Card -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">Method 2 Equation Solution (Resultant Moment = Sum of Moments)</h3>
+                    </div>
+
+                    <div id="math-steps-container" class="space-y-2.5 font-mono-code text-xs">
+                        <!-- Dynamic Math injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (LG: COL-5): SYSTEM SETTINGS & FORCE CONTROLS -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                
+                <!-- Controls Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-600"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Beam Length & Distance (x) from end (A/B)</h2>
+                        </div>
+                        <div class="flex items-center gap-1 text-[11px]">
+                            <button onclick="applyPreset('q18')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold px-2 py-0.5 rounded shadow-sm border border-amber-300">
+                                
+                        </div>
+                    </div>
+
+                    <!-- SYSTEM CONFIGURATION PANEL -->
+                    <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200 space-y-2.5 mb-4">
+                        <div class="font-extrabold text-xs text-indigo-950 flex items-center justify-between border-b border-indigo-200/80 pb-1">
+                            <span><i class="fa-solid fa-gear text-indigo-600 mr-1"></i> Reference & Distance Settings</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <!-- Beam Length Selector -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Beam Length (L):
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="input-beam-length" min="1" max="100" step="0.5" value="10"
+                                           class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                           oninput="changeBeamLength(this.value)" placeholder="10">
+                                    <span class="font-bold text-xs text-indigo-900">m</span>
+                                </div>
+                            </div>
+
+                            <!-- Datum Reference Selector -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Reference Point A:
+                                </label>
+                                <select id="select-datum" onchange="changeDatum(this.value)" class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer">
+                                    <option value="left" selected>Left End (Point A)</option>
+                                    <option value="right">Right End (Point A)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Distance Display Mode (Interval Spacing vs Absolute Distance) -->
+                        <div class="pt-1 border-t border-indigo-200/60 flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-slate-700">Display Interval Spacing (X<sub>1</sub>, X<sub>2</sub>, ...):</span>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="chk-show-intervals" checked onchange="updatePhysics()" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 relative"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Force List Header & Add Button -->
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Active Forces (F<sub>1</sub>, F<sub>2</sub>, F<sub>n</sub>)
+                        </span>
+                        <button onclick="addForce()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-plus"></i> Add Force
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Force Input Cards Container -->
+                    <div id="forces-input-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                        <!-- Dynamic Force Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Theory Formula Card Footer -->
+                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 text-xs space-y-1">
+                    <span class="font-bold text-amber-950 block uppercase text-[11px]">Method 2 Principle (Resultant Moment):</span>
+                    <p class="text-slate-700 text-[11px] leading-relaxed">
+                        Resultant moment of force is equal to the sum of moments of force action:
+                        [Resultant Moment = (F1+F2+...Fn).x] </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Custom Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1736] text-slate-400 py-3 text-center text-xs mt-auto border-t border-indigo-900/40">
+        <p>Method 2 Resultant Moment Simulator • Science Unit JMSK, PPD</p>
+    </footer>
+
+    <script>
+        let beamLength = 10;     // Total length of beam in meters
+        let datumSide = 'left';  // 'left' (Point A on Left) or 'right' (Point A on Right)
+
+        // Default force system with direction and angle (theta) support
+        let forces = [
+            { id: 1, F: 20, x: 0.0, dir: 'down', angle: 90 },  // F1 at A (x = 0)
+            { id: 2, F: 30, x: 3.0, dir: 'down', angle: 90 },  // F2 at 3m from A
+            { id: 3, F: 25, x: 8.0, dir: 'down', angle: 90 }   // F3 at 8m from A
+        ];
+
+        let nextForceId = 4;
+
+        const canvas = document.getElementById('beamCanvas');
+        const ctx = canvas.getContext('2d');
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            renderForceInputCards();
+            updatePhysics();
+            requestAnimationFrame(animateLoop);
+        };
+
+        function showNotification(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold transition-all transform duration-300 pointer-events-auto flex items-center gap-2 ${
+                type === 'error' ? 'bg-rose-900 text-white border-rose-700' : 'bg-indigo-900 text-white border-indigo-700'
+            }`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i> ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function applyPreset(preset) {
+            if (preset === 'q18') {
+                beamLength = 10;
+                datumSide = 'left';
+                
+                const bInput = document.getElementById('input-beam-length');
+                if (bInput) bInput.value = 10;
+                document.getElementById('select-datum').value = 'left';
+
+                forces = [
+                    { id: 1, F: 25, x: 1.0, dir: 'up', angle: 90 },    // 25N Up at 1m
+                    { id: 2, F: 40, x: 4.0, dir: 'down', angle: 90 },  // 40N Down at 4m (1m + 3m)
+                    { id: 3, F: 10, x: 8.0, dir: 'down', angle: 90 },  // 10N Down at 8m (4m + 4m)
+                    { id: 4, F: 20, x: 10.0, dir: 'up', angle: 10 }    // 20N Up at 10m angled 10°
+                ];
+                nextForceId = 5;
+                renderForceInputCards();
+                updatePhysics();
+                showNotification("Question 18 (Dec 2014) preset loaded successfully.");
+            }
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        function changeBeamLength(val) {
+            let newLen = parseFloat(val);
+            if (isNaN(newLen) || newLen <= 0) return;
+
+            beamLength = newLen;
+
+            forces.forEach(f => {
+                f.x = parseFloat(Math.min(beamLength, f.x).toFixed(1));
+            });
+
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function changeDatum(val) {
+            datumSide = val;
+
+            forces.forEach(f => {
+                f.x = parseFloat((beamLength - f.x).toFixed(1));
+            });
+
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function resetSimulator() {
+            beamLength = 10;
+            datumSide = 'left';
+
+            const bInput = document.getElementById('input-beam-length');
+            if (bInput) bInput.value = 10;
+
+            document.getElementById('select-datum').value = 'left';
+
+            forces = [
+                { id: 1, F: 20, x: 0.0, dir: 'down', angle: 90 },
+                { id: 2, F: 30, x: 3.0, dir: 'down', angle: 90 },
+                { id: 3, F: 25, x: 8.0, dir: 'down', angle: 90 }
+            ];
+            nextForceId = 4;
+            renderForceInputCards();
+            updatePhysics();
+            showNotification("Simulator reset to default state.");
+        }
+
+        function addForce() {
+            if (forces.length >= 6) {
+                showNotification("Maximum of 6 forces allowed for layout clarity.", "error");
+                return;
+            }
+            forces.push({
+                id: nextForceId++,
+                F: 15,
+                x: parseFloat((Math.random() * (beamLength * 0.8) + (beamLength * 0.1)).toFixed(1)),
+                dir: 'down',
+                angle: 90
+            });
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function removeForce(id) {
+            if (forces.length <= 1) {
+                showNotification("At least one force is required.", "error");
+                return;
+            }
+            forces = forces.filter(f => f.id !== id);
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function updateForceParam(id, key, value) {
+            const force = forces.find(f => f.id === id);
+            if (force) {
+                if (key === 'dir') {
+                    force.dir = value; // 'down' or 'up'
+                } else {
+                    let parsedVal = parseFloat(value);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+                    
+                    if (key === 'x') {
+                        parsedVal = Math.max(0, Math.min(beamLength, parsedVal));
+                    } else if (key === 'F') {
+                        parsedVal = Math.max(0, parsedVal);
+                    } else if (key === 'angle') {
+                        parsedVal = Math.max(10, Math.min(170, parsedVal));
+                    }
+
+                    force[key] = parsedVal;
+
+                    const sliderEl = document.getElementById(`slider-${key}-${id}`);
+                    const inputEl = document.getElementById(`input-${key}-${id}`);
+                    if (sliderEl) sliderEl.value = parsedVal;
+                    if (inputEl && document.activeElement !== inputEl) inputEl.value = parsedVal;
+                }
+
+                updatePhysics();
+            }
+        }
+
+        function renderForceInputCards() {
+            const container = document.getElementById('forces-input-container');
+            let html = '';
+
+            forces.sort((a, b) => a.x - b.x);
+
+            forces.forEach((f, index) => {
+                let isUp = f.dir === 'up';
+                let isAngled = f.angle !== 90;
+                let perpF = (f.F * Math.sin((f.angle * Math.PI) / 180)).toFixed(1);
+
+                html += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative">
+                        <div class="flex items-center justify-between font-bold text-xs border-b border-slate-200/60 pb-1.5">
+                            <span class="text-indigo-900 flex items-center gap-1.5">
+                                <i class="fa-solid ${isUp ? 'fa-arrow-up text-blue-600' : 'fa-arrow-down text-rose-500'}"></i> Force F<sub>${index + 1}</sub>
+                            </span>
+                            
+                            <div class="flex items-center gap-2">
+                                <select onchange="updateForceParam(${f.id}, 'dir', this.value)" 
+                                        class="bg-white border border-slate-300 font-bold text-[11px] rounded px-1.5 py-0.5 ${isUp ? 'text-blue-700 border-blue-400' : 'text-rose-700 border-rose-400'} focus:outline-none cursor-pointer">
+                                    <option value="down" ${!isUp ? 'selected' : ''}>↓ Downward</option>
+                                    <option value="up" ${isUp ? 'selected' : ''}>↑ Upward</option>
+                                </select>
+                                <button onclick="removeForce(${f.id})" class="text-rose-500 hover:text-rose-700 text-xs px-1" title="Delete Force">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Force (F):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-F-${f.id}" min="0" max="1000" step="1" value="${f.F}"
+                                               class="w-12 bg-white border border-rose-300 font-bold text-rose-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'F', this.value)">
+                                        <span class="font-bold text-rose-600">N</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-F-${f.id}" min="1" max="200" value="${f.F}" step="1"
+                                       class="w-full accent-rose-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'F', this.value)">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Angle (θ):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-angle-${f.id}" min="10" max="170" step="1" value="${f.angle}"
+                                               class="w-12 bg-white border border-amber-300 font-bold text-amber-700 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'angle', this.value)">
+                                        <span class="font-bold text-amber-700">°</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-angle-${f.id}" min="10" max="170" value="${f.angle}" step="1"
+                                       class="w-full accent-amber-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'angle', this.value)">
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Distance:</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-x-${f.id}" min="0" max="${beamLength}" step="0.1" value="${f.x.toFixed(1)}"
+                                               class="w-12 bg-white border border-blue-300 font-bold text-blue-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'x', this.value)">
+                                        <span class="font-bold text-blue-600">m</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-x-${f.id}" min="0" max="${beamLength}" value="${f.x}" step="0.1"
+                                       class="w-full accent-blue-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'x', this.value)">
+                            </div>
+                        </div>
+
+                        ${isAngled ? `
+                            <div class="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 flex justify-between font-mono-code font-bold">
+                                <span>Perpendicular F<sub>⊥</sub> = F sin(${f.angle}°)</span>
+                                <span>${perpF} N</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function updatePhysics() {
+            const pointAName = datumSide === 'left' ? 'LEFT END (Point A)' : 'RIGHT END (Point A)';
+            document.getElementById('overlay-datum-badge').innerHTML = `<span>REFERENCE POINT: ${pointAName}</span>`;
+
+            let sortedForces = forces.slice().sort((a, b) => a.x - b.x);
+
+            let totalFx = 0; // Sum of moments (N*m)
+            let totalF = 0;  // Sum of vertical forces (N)
+
+            sortedForces.forEach(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                
+                let dirSign = f.dir === 'up' ? -1 : 1;
+
+                totalFx += dirSign * Fy * f.x;
+                totalF += dirSign * Fy;
+            });
+
+            let cogX = Math.abs(totalF) > 0.001 ? (totalFx / totalF) : 0;
+
+            document.getElementById('metric-total-f').innerText = `${totalF.toFixed(1)} N`;
+            document.getElementById('metric-total-m').innerText = `${totalFx.toFixed(1)} N·m`;
+            document.getElementById('metric-cog').innerText = `${cogX.toFixed(2)} m`;
+            document.getElementById('metric-res-moment').innerText = `${totalF.toFixed(1)}x N·m`;
+
+            const badge = document.getElementById('badge-cog-status');
+            if (badge) {
+                badge.innerHTML = `<i class="fa-solid fa-location-dot text-amber-600"></i> CoG Position (x = ${cogX.toFixed(2)} m)`;
+            }
+
+            renderMethod2MathSteps(sortedForces, cogX, totalFx, totalF);
+        }
+
+        function renderMethod2MathSteps(sortedForces, cogX, totalFx, totalF) {
+            const container = document.getElementById('math-steps-container');
+
+            let pointAStr = datumSide === 'left' ? 'A (Left End)' : 'A (Right End)';
+
+            let momentTermsSymbolic = sortedForces.map((f, i) => {
+                let signStr = f.dir === 'up' ? '-' : '+';
+                let angleStr = f.angle !== 90 ? `·sin(${f.angle}°)` : '';
+                return `${signStr}(F<sub>${i+1}</sub>${angleStr})(${f.x.toFixed(1)})`;
+            }).join(' ');
+
+            let momentTermsNumeric = sortedForces.map((f, i) => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let signStr = f.dir === 'up' ? '-' : '+';
+                let fyValStr = f.angle !== 90 ? `(${f.F}·sin${f.angle}°)` : `${f.F}`;
+                return `${signStr} (${fyValStr})(${f.x.toFixed(1)})`;
+            }).join(' ');
+
+            let momentValuesExpanded = sortedForces.map(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let signVal = f.dir === 'up' ? -(Fy * f.x) : (Fy * f.x);
+                return `${signVal >= 0 ? '+' : ''}${signVal.toFixed(1)}`;
+            }).join(' ');
+
+            let totalForceValExpr = sortedForces.map(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let signVal = f.dir === 'up' ? -Fy : Fy;
+                return `${signVal >= 0 ? '+' : ''}${signVal.toFixed(1)}`;
+            }).join(' ');
+
+            let html = `
+                <div class="bg-indigo-50/80 p-3 rounded-xl border border-indigo-200 space-y-1">
+                    <div class="font-bold text-indigo-950">1. Resultant Moment Definition:</div>
+                    <div class="text-slate-800">
+                        Resultant moment = Sum of moments of perpendicular force action:
+                    </div>
+                    <div class="font-bold text-indigo-900 py-1 text-center bg-white/70 rounded border border-indigo-200">
+                        Resultant Moment = (F1+F2+...Fn).x
+                            </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-blue-900">2. Sum of Moments about Point ${pointAStr}:</div>
+                    <div class="text-slate-800 overflow-x-auto py-1 text-[11px]">
+                        ${momentTermsSymbolic} = (${totalForceValExpr}) · x
+                    </div>
+                    <div class="text-slate-800 overflow-x-auto py-1 text-[11px]">
+                        ${momentTermsNumeric} = (${totalF.toFixed(1)}) · x
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-emerald-900">3. Calculate Sum of Moments and Total Force:</div>
+                    <div class="text-slate-800">
+                        ${momentValuesExpanded} = (${totalF.toFixed(1)}) · x
+                    </div>
+                    <div class="text-slate-800 font-bold">
+                        ${totalFx.toFixed(1)} N·m = ${totalF.toFixed(1)}x
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 space-y-1">
+                    <div class="font-bold text-amber-950">4. Solve for x (Center of Gravity from A):</div>
+                    <div class="text-slate-800">
+                        x = ${totalFx.toFixed(1)} / ${totalF.toFixed(1)}
+                    </div>
+                    <div class="text-amber-900 text-sm font-extrabold mt-1">
+                        So, x = <span class="bg-amber-200 px-2 py-0.5 rounded text-slate-950">${cogX.toFixed(2)} m</span> (from Point A)
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function animateLoop() {
+            drawCanvasScene();
+            requestAnimationFrame(animateLoop);
+        }
+
+        function drawCanvasScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Increased horizontal margin to allow 10-degree angled vectors at edges without clipping
+            const marginX = Math.max(w * 0.15, 80);
+            const beamWidthPx = w - marginX * 2;
+            const beamYPx = h * 0.44;
+
+            let sortedForces = forces.slice().sort((a, b) => a.x - b.x);
+
+            // 1. Draw Distance Scale Ruler at Bottom
+            const rulerY = h - 35;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(marginX, rulerY);
+            ctx.lineTo(marginX + beamWidthPx, rulerY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+
+            let step = beamLength <= 10 ? 2 : (beamLength <= 15 ? 3 : 4);
+            for (let i = 0; i <= beamLength; i += step) {
+                let physicalX = datumSide === 'left' ? i : (beamLength - i);
+                let markPx = marginX + (physicalX / beamLength) * beamWidthPx;
+
+                ctx.beginPath();
+                ctx.moveTo(markPx, rulerY - 5);
+                ctx.lineTo(markPx, rulerY + 5);
+                ctx.stroke();
+                ctx.fillText(`${i}m`, markPx, rulerY + 17);
+            }
+
+            // Point A and Point B Labels at Beam Ends
+            let pointAPx = datumSide === 'left' ? marginX : (marginX + beamWidthPx);
+            let pointBPx = datumSide === 'left' ? (marginX + beamWidthPx) : marginX;
+
+            ctx.fillStyle = '#1e293b';
+            ctx.font = 'extrabold 14px "Plus Jakarta Sans"';
+            ctx.textAlign = datumSide === 'left' ? 'right' : 'left';
+            ctx.fillText('A', pointAPx + (datumSide === 'left' ? -10 : 10), beamYPx + 5);
+
+            ctx.textAlign = datumSide === 'left' ? 'left' : 'right';
+            ctx.fillText('B', pointBPx + (datumSide === 'left' ? 10 : -10), beamYPx + 5);
+
+            // 2. Draw Beam AB
+            ctx.fillStyle = '#fef08a';
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.roundRect(marginX, beamYPx - 6, beamWidthPx, 12, 3);
+            ctx.fill();
+            ctx.stroke();
+
+            // 3. Calculate Center of Gravity (x)
+            let totalFx = 0, totalF = 0;
+            sortedForces.forEach(f => { 
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+                totalFx += dirSign * Fy * f.x; 
+                totalF += dirSign * Fy; 
+            });
+            let cogX = Math.abs(totalF) > 0.001 ? (totalFx / totalF) : (beamLength / 2);
+            let cogAbsLeft = datumSide === 'left' ? cogX : (beamLength - cogX);
+            let cogPx = marginX + (cogAbsLeft / beamLength) * beamWidthPx;
+
+            // 4. Draw Upward/Downward Center of Gravity Arrow
+            const cgStartY = beamYPx + (totalF >= 0 ? 45 : -45);
+            const cgEndY = beamYPx + (totalF >= 0 ? 8 : -8);
+
+            ctx.strokeStyle = '#f97316';
+            ctx.fillStyle = '#f97316';
+            ctx.lineWidth = 3;
+
+            ctx.beginPath();
+            ctx.moveTo(cogPx, cgStartY);
+            ctx.lineTo(cogPx, cgEndY);
+            ctx.stroke();
+
+            // Arrowhead
+            const headLen = 9;
+            ctx.beginPath();
+            ctx.moveTo(cogPx, cgEndY);
+            let arrowDirY = totalF >= 0 ? 1 : -1;
+            ctx.lineTo(cogPx - headLen * 0.5, cgEndY + arrowDirY * headLen);
+            ctx.lineTo(cogPx + headLen * 0.5, cgEndY + arrowDirY * headLen);
+            ctx.closePath();
+            ctx.fill();
+
+            // Label 'Center of gravity'
+            ctx.fillStyle = '#c2410c';
+            ctx.font = 'bold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Center of gravity (x = ${cogX.toFixed(2)}m)`, cogPx, cgStartY + (totalF >= 0 ? 15 : -10));
+
+            // 5. Draw Dimension Line 'x' from Point A to Center of Gravity
+            ctx.strokeStyle = '#2563eb';
+            ctx.fillStyle = '#2563eb';
+            ctx.lineWidth = 1.3;
+
+            let dimY = beamYPx + 24;
+            ctx.beginPath();
+            ctx.moveTo(pointAPx, dimY);
+            ctx.lineTo(cogPx, dimY);
+            ctx.stroke();
+
+            // Ticks
+            ctx.beginPath();
+            ctx.moveTo(pointAPx, dimY - 3);
+            ctx.lineTo(pointAPx, dimY + 3);
+            ctx.moveTo(cogPx, dimY - 3);
+            ctx.lineTo(cogPx, dimY + 3);
+            ctx.stroke();
+
+            // Label 'x' centered on dimension line
+            let midX = (pointAPx + cogPx) / 2;
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            const xTextWidth = ctx.measureText(`x = ${cogX.toFixed(2)}m`).width;
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.fillRect(midX - xTextWidth / 2 - 2, dimY - 5, xTextWidth + 4, 10);
+
+            ctx.fillStyle = '#1d4ed8';
+            ctx.textAlign = 'center';
+            ctx.fillText(`x = ${cogX.toFixed(2)}m`, midX, dimY + 3);
+
+            // 6. Anti-Collision Staggering for Forces F_i
+            let forceOffsets = sortedForces.map((f, idx) => {
+                let fAbsLeft = datumSide === 'left' ? f.x : (beamLength - f.x);
+                let fPx = marginX + (fAbsLeft / beamLength) * beamWidthPx;
+                let arrowLen = Math.max((f.F / 100) * 45, 28);
+                return { id: f.id, originalIdx: idx, F: f.F, x: f.x, dir: f.dir, angle: f.angle, fPx, arrowLen, labelYTier: 0 };
+            });
+
+            const minLabelDistancePx = 50;
+            for (let i = 1; i < forceOffsets.length; i++) {
+                let prev = forceOffsets[i - 1];
+                let curr = forceOffsets[i];
+                if (Math.abs(curr.fPx - prev.fPx) < minLabelDistancePx) {
+                    curr.labelYTier = (prev.labelYTier + 1) % 2;
+                }
+            }
+
+            // 7. Draw Force Vectors F_1, F_2, ... with Angled and Direction support
+            forceOffsets.forEach((item) => {
+                let forcePx = item.fPx;
+                let arrowLen = Math.max(item.arrowLen, 42);
+                let labelExtraOffset = item.labelYTier * 18;
+                let isUp = item.dir === 'up';
+
+                let thetaRad = (item.angle * Math.PI) / 180;
+                let dx = arrowLen * Math.cos(thetaRad);
+                let dy = Math.max(arrowLen * Math.sin(thetaRad), 12);
+
+                let endX = forcePx;
+                let endY = beamYPx + (isUp ? 6 : -6);
+
+                // Direct trigonometric start position for smooth transition from 10° to 170°
+                let startX = forcePx + dx;
+                let startY = isUp ? (endY + dy + labelExtraOffset) : (endY - (dy + labelExtraOffset));
+
+                let color = isUp ? '#2563eb' : '#dc2626';
+
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2.8;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                let headAngle = Math.atan2(endY - startY, endX - startX);
+                const hLen = 9;
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(endX - hLen * Math.cos(headAngle - Math.PI / 6), endY - hLen * Math.sin(headAngle - Math.PI / 6));
+                ctx.lineTo(endX - hLen * Math.cos(headAngle + Math.PI / 6), endY - hLen * Math.sin(headAngle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                const labelText = `F${item.originalIdx + 1} = ${item.F}N${item.angle !== 90 ? ` (${item.angle}°)` : ''}`;
+                ctx.font = 'bold 10px "Plus Jakarta Sans"';
+                const metrics = ctx.measureText(labelText);
+                const padX = 4;
+                const labelY = startY + (isUp ? 15 : -6);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(startX - metrics.width / 2 - padX, labelY - 12, metrics.width + padX * 2, 14, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                ctx.textAlign = 'center';
+                ctx.fillText(labelText, startX, labelY - 2);
+            });
+
+            // 8. Draw Interval Spacing Arrows (X_1, X_2, ...)
+            const showIntervals = document.getElementById('chk-show-intervals')?.checked ?? true;
+
+            if (showIntervals && forceOffsets.length > 1) {
+                const intervalY = beamYPx - 18;
+
+                for (let i = 0; i < forceOffsets.length - 1; i++) {
+                    let startPx = forceOffsets[i].fPx;
+                    let endPx = forceOffsets[i + 1].fPx;
+                    let distVal = Math.abs(forceOffsets[i + 1].x - forceOffsets[i].x);
+
+                    if (Math.abs(endPx - startPx) > 15) {
+                        ctx.strokeStyle = '#0284c7';
+                        ctx.fillStyle = '#0284c7';
+                        ctx.lineWidth = 1.2;
+
+                        ctx.beginPath();
+                        ctx.moveTo(startPx, intervalY);
+                        ctx.lineTo(endPx, intervalY);
+                        ctx.stroke();
+
+                        let arrowHead = 4;
+                        ctx.beginPath();
+                        ctx.moveTo(startPx, intervalY);
+                        ctx.lineTo(startPx + arrowHead, intervalY - 2.5);
+                        ctx.lineTo(startPx + arrowHead, intervalY + 2.5);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        ctx.beginPath();
+                        ctx.moveTo(endPx, intervalY);
+                        ctx.lineTo(endPx - arrowHead, intervalY - 2.5);
+                        ctx.lineTo(endPx - arrowHead, intervalY + 2.5);
+                        ctx.closePath();
+                        ctx.fill();
+
+                        let midPx = (startPx + endPx) / 2;
+                        let labelStr = `X${i + 1} = ${distVal.toFixed(1)}m`;
+                        ctx.font = 'bold 8.5px "Plus Jakarta Sans"';
+                        let textW = ctx.measureText(labelStr).width;
+
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.fillRect(midPx - textW / 2 - 2, intervalY - 4, textW + 4, 8);
+
+                        ctx.fillStyle = '#0369a1';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(labelStr, midPx, intervalY + 2);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
