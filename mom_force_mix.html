@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moment of Force & Center of Gravity Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+
+        .font-mono-code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle, #ffffff 0%, #f1f5f9 100%);
+            border: 2px solid #cbd5e1;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            touch-action: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Header Navigation Banner -->
+    <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-400/20 p-2.5 rounded-xl border border-amber-400/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-arrows-to-dot text-xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide uppercase text-white flex items-center gap-2">
+                        MOMENT OF FORCE & CENTER OF GRAVITY SIMULATOR
+                    </h1>
+                    <p class="text-[11px] text-slate-300">Method 1: Determine Center of Gravity (x) using Principle of Moment of Force (&Sigma; M<sub>ccw</sub> = &Sigma; M<sub>cw</sub>)</p>
+                </div>
+            </div>
+            
+            <!-- Actions Widget -->
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Method Switch Button -->
+                <a href="resultant_moment.html" class="bg-indigo-800 hover:bg-indigo-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm border border-indigo-600">
+                    <i class="fa-solid fa-calculator"></i> Method 2
+                </a>
+
+                <!-- Home Button -->
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
+
+                <!-- Reset Button -->
+                <button onclick="resetSimulator()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container: Side-by-Side Layout -->
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+            
+            <!-- LEFT COLUMN (LG: COL-7): VISUAL BEAM CANVAS & STEP-BY-STEP ALGEBRA -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <!-- Section Header -->
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-crosshairs text-amber-500"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Visual Beam System & Center of Gravity</h2>
+                        </div>
+                        <span id="badge-cog-status" class="bg-amber-100 text-amber-900 font-extrabold text-[11px] px-3 py-1 rounded-lg border border-amber-300 uppercase flex items-center gap-1">
+                            <i class="fa-solid fa-location-dot text-amber-600"></i> CoG Position (x = 5.33 m)
+                        </span>
+                    </div>
+
+                    <!-- Canvas Interactive Beam -->
+                    <div class="canvas-container rounded-xl overflow-hidden h-[340px] sm:h-[380px] flex items-center justify-center relative">
+                        <canvas id="beamCanvas" class="w-full h-full block"></canvas>
+                        
+                        <!-- Top-Left Datum Legend Overlay -->
+                        <div id="overlay-datum-badge" class="absolute top-3 left-3 bg-indigo-900/90 backdrop-blur-sm border border-indigo-700 text-white font-extrabold text-[11px] px-3 py-1 rounded-lg shadow-sm">
+                            <span>REF POINT : LEFT END (x = 0.0 m)</span>
+                        </div>
+
+                        <!-- Auto Find Center of Gravity Button -->
+                        <button onclick="snapPivotToCoG()" class="absolute top-3 right-3 text-[11px] bg-amber-400 hover:bg-amber-500 text-slate-950 px-3 py-1.5 rounded-lg font-extrabold border border-amber-500 shadow-md transition flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-crosshairs text-slate-900"></i> Set Fulcrum O at CoG (x)
+                        </button>
+                    </div>
+
+                    <!-- Visual Helper Metric Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 text-center">
+                        <div class="bg-blue-50/70 border border-blue-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-blue-700 font-bold block uppercase">Net Perpendicular (&Sigma; F<sub>&perp;</sub>)</span>
+                            <span id="metric-total-f" class="text-xs sm:text-sm font-extrabold text-blue-900 font-mono-code">60.0 N</span>
+                        </div>
+                        <div class="bg-emerald-50/70 border border-emerald-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-emerald-700 font-bold block uppercase">Total Moment (&Sigma; M)</span>
+                            <span id="metric-total-m" class="text-xs sm:text-sm font-extrabold text-emerald-900 font-mono-code">320.0 N·m</span>
+                        </div>
+                        <div class="bg-amber-50/70 border border-amber-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-amber-700 font-bold block uppercase">Calculated CoG (x)</span>
+                            <span id="metric-cog" class="text-xs sm:text-sm font-extrabold text-amber-900 font-mono-code">5.33 m</span>
+                        </div>
+                        <div class="bg-purple-50/70 border border-purple-200 p-2 rounded-xl">
+                            <span class="text-[10px] text-purple-700 font-bold block uppercase">Fulcrum Position (x<sub>O</sub>)</span>
+                            <span id="metric-pivot" class="text-xs sm:text-sm font-extrabold text-purple-900 font-mono-code">5.33 m</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Method 1 Step-by-Step Derivation Card -->
+                <div class="space-y-3 pt-2 border-t border-slate-100">
+                    <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+                        <i class="fa-solid fa-list-check text-indigo-600"></i>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm uppercase tracking-wide">Method 1 Equation Solution (&Sigma; M<sub>ccw</sub> = &Sigma; M<sub>cw</sub>)</h3>
+                    </div>
+
+                    <div id="math-steps-container" class="space-y-2.5 font-mono-code text-xs">
+                        <!-- Dynamic Math injected via JS -->
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN (LG: COL-5): SYSTEM SETTINGS, FORCE CONTROLS & PRESETS -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                
+                <!-- Controls Header -->
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-600"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Beam Length & Distance (x) Reference Settings</h2>
+                        </div>
+                    </div>
+
+                    <!-- SYSTEM CONFIGURATION PANEL (Beam Length & Ref Point) -->
+                    <div class="bg-indigo-50/70 p-3 rounded-xl border border-indigo-200 space-y-2.5 mb-4">
+                        <div class="font-extrabold text-xs text-indigo-950 flex items-center justify-between border-b border-indigo-200/80 pb-1">
+                            <span><i class="fa-solid fa-gear text-indigo-600 mr-1"></i> Reference Mode for Distance (x)</span>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <!-- Beam Length Selector -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Beam Length (L):
+                                </label>
+                                <div class="flex items-center gap-1">
+                                    <input type="number" id="input-beam-length" min="1" max="100" step="0.5" value="10"
+                                           class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                                           oninput="changeBeamLength(this.value)" placeholder="10">
+                                    <span class="font-bold text-xs text-indigo-900">m</span>
+                                </div>
+                            </div>
+
+                            <!-- Datum Reference Selector for x -->
+                            <div>
+                                <label class="text-slate-700 font-bold block mb-1 text-[11px]">
+                                    Measure x from which End?
+                                </label>
+                                <select id="select-datum" onchange="changeDatum(this.value)" class="w-full bg-white border border-indigo-300 rounded-lg p-1.5 text-xs font-bold font-mono-code text-indigo-900 focus:outline-none focus:ring-1 focus:ring-indigo-500 cursor-pointer">
+                                    <option value="left" selected>Left End</option>
+                                    <option value="right">Right End</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Distance Display Mode -->
+                        <div class="pt-1 border-t border-indigo-200/60 flex items-center justify-between text-[11px]">
+                            <span class="font-bold text-slate-700">Display Question Dimension Arrows:</span>
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input type="checkbox" id="chk-show-dimensions" checked onchange="updatePhysics()" class="sr-only peer">
+                                <div class="w-9 h-5 bg-slate-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 relative"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Fulcrum O Position Slider -->
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 mb-4">
+                        <div class="flex justify-between text-xs font-semibold">
+                            <label class="text-amber-700 font-bold flex items-center gap-1">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Fulcrum O Position (x<sub>O</sub>):
+                            </label>
+                            <span id="val-pivot-display" class="font-extrabold text-amber-700 font-mono-code">5.33 m</span>
+                        </div>
+                        <input type="range" id="slider-pivot" min="0" max="10" value="5.33" step="0.01" 
+                               class="w-full accent-amber-500 cursor-pointer" oninput="updatePhysics()">
+                        <div class="flex justify-between text-[10px] text-slate-500 font-bold">
+                            <span id="lbl-pivot-start">0m (Reference)</span>
+                            <span id="lbl-pivot-mid">5m (Midpoint)</span>
+                            <span id="lbl-pivot-end">10m</span>
+                        </div>
+                    </div>
+
+                    <!-- Force List Header & Add Button -->
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                            Active Forces (F<sub>1</sub>, F<sub>2</sub>, F<sub>n</sub>)
+                        </span>
+                        <button onclick="addForce()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-2.5 py-1 rounded-lg transition flex items-center gap-1 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-plus"></i> Add Force
+                        </button>
+                    </div>
+
+                    <!-- Dynamic Force Input Cards Container -->
+                    <div id="forces-input-container" class="space-y-3 max-h-[340px] overflow-y-auto pr-1">
+                        <!-- Dynamic Force Cards injected via JS -->
+                    </div>
+                </div>
+
+                <!-- Theory Formula Card Footer -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1">
+                    <span class="font-bold text-slate-800 block uppercase text-[11px]">Method 1 Note (Principle of Moment of Force):</span>
+                    <p class="text-slate-600 text-[11px] leading-relaxed">
+                        Assume Center of Gravity is at point O at distance x. Express each force moment relative to O ($\sum M_{\text{ccw}} = \sum M_{\text{cw}}$), incorporating direction ($\uparrow/\downarrow$) and perpendicular components ($F_{\perp} = F \sin\theta$).
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Custom Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1736] text-slate-400 py-3 text-center text-xs mt-auto border-t border-indigo-900/40">
+        <p>Moment of Force & Center of Gravity Simulator • Science Unit JMSK, PPD</p>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        let beamLength = 10;     // Total length of beam in meters
+        let datumSide = 'left';  // 'left' or 'right'
+        let pivotPos = 5.33;     // Position of Fulcrum O in meters
+
+        // Forces array with dir ('down'/'up') and angle properties
+        let forces = [
+            { id: 1, F: 20, x: 2.0, dir: 'down', angle: 90 },
+            { id: 2, F: 10, x: 4.0, dir: 'down', angle: 90 },
+            { id: 3, F: 15, x: 7.0, dir: 'down', angle: 90 },
+            { id: 4, F: 15, x: 9.0, dir: 'down', angle: 90 }
+        ];
+
+        let nextForceId = 5;
+
+        let beamTiltAngle = 0;
+        let targetTiltAngle = 0;
+
+        const canvas = document.getElementById('beamCanvas');
+        const ctx = canvas.getContext('2d');
+
+        window.onload = function() {
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            renderForceInputCards();
+            updatePhysics();
+            requestAnimationFrame(animateLoop);
+        };
+
+        function showNotification(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold transition-all transform duration-300 pointer-events-auto flex items-center gap-2 ${
+                type === 'error' ? 'bg-rose-900 text-white border-rose-700' : 'bg-indigo-900 text-white border-indigo-700'
+            }`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i> ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        function changeBeamLength(val) {
+            let newLen = parseFloat(val);
+            if (isNaN(newLen) || newLen <= 0) return;
+
+            beamLength = newLen;
+
+            pivotPos = parseFloat(Math.min(beamLength, pivotPos).toFixed(2));
+            forces.forEach(f => {
+                f.x = parseFloat(Math.min(beamLength, f.x).toFixed(1));
+            });
+
+            const pSlider = document.getElementById('slider-pivot');
+            if (pSlider) {
+                pSlider.max = beamLength;
+                pSlider.value = pivotPos;
+            }
+
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function changeDatum(val) {
+            datumSide = val;
+
+            forces.forEach(f => {
+                f.x = parseFloat((beamLength - f.x).toFixed(1));
+            });
+            pivotPos = parseFloat((beamLength - pivotPos).toFixed(2));
+
+            document.getElementById('slider-pivot').value = pivotPos;
+
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function resetSimulator() {
+            beamLength = 10;
+            datumSide = 'left';
+            pivotPos = 5.33;
+
+            const bInput = document.getElementById('input-beam-length');
+            if (bInput) bInput.value = 10;
+
+            document.getElementById('select-datum').value = 'left';
+
+            const pSlider = document.getElementById('slider-pivot');
+            pSlider.max = 10;
+            pSlider.value = 5.33;
+
+            forces = [
+                { id: 1, F: 20, x: 2.0, dir: 'down', angle: 90 },
+                { id: 2, F: 10, x: 4.0, dir: 'down', angle: 90 },
+                { id: 3, F: 15, x: 7.0, dir: 'down', angle: 90 },
+                { id: 4, F: 15, x: 9.0, dir: 'down', angle: 90 }
+            ];
+            nextForceId = 5;
+            renderForceInputCards();
+            updatePhysics();
+            showNotification("Simulator reset to default state.");
+        }
+
+        function applyPreset(preset) {
+            if (preset === 'preset1') {
+                forces = [
+                    { id: 1, F: 30, x: 2.0, dir: 'down', angle: 90 },
+                    { id: 2, F: 30, x: beamLength - 2.0, dir: 'down', angle: 90 }
+                ];
+                pivotPos = beamLength / 2;
+            } else if (preset === 'preset2') {
+                forces = [
+                    { id: 1, F: 20, x: 2.0, dir: 'down', angle: 90 },
+                    { id: 2, F: 10, x: 4.0, dir: 'down', angle: 90 },
+                    { id: 3, F: 15, x: 7.0, dir: 'down', angle: 90 },
+                    { id: 4, F: 15, x: 9.0, dir: 'down', angle: 90 }
+                ];
+                pivotPos = 5.33;
+            } else if (preset === 'q18') {
+                beamLength = 10;
+                datumSide = 'left';
+                
+                const bInput = document.getElementById('input-beam-length');
+                if (bInput) bInput.value = 10;
+                document.getElementById('select-datum').value = 'left';
+
+                forces = [
+                    { id: 1, F: 25, x: 1.0, dir: 'up', angle: 90 },    // 25N Up at 1m
+                    { id: 2, F: 40, x: 4.0, dir: 'down', angle: 90 },  // 40N Down at 4m
+                    { id: 3, F: 10, x: 8.0, dir: 'down', angle: 90 },  // 10N Down at 8m
+                    { id: 4, F: 20, x: 10.0, dir: 'up', angle: 10 }    // 20N Up at 10m angled 10°
+                ];
+                nextForceId = 5;
+                pivotPos = 8.37;
+            }
+            document.getElementById('slider-pivot').value = pivotPos;
+            renderForceInputCards();
+            updatePhysics();
+            showNotification(`Preset "${preset}" loaded.`);
+        }
+
+        function addForce() {
+            if (forces.length >= 6) {
+                showNotification("Maximum of 6 forces allowed for clarity.", "error");
+                return;
+            }
+            forces.push({
+                id: nextForceId++,
+                F: 10,
+                x: parseFloat((Math.random() * (beamLength * 0.8) + (beamLength * 0.1)).toFixed(1)),
+                dir: 'down',
+                angle: 90
+            });
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function removeForce(id) {
+            if (forces.length <= 1) {
+                showNotification("At least one force is required.", "error");
+                return;
+            }
+            forces = forces.filter(f => f.id !== id);
+            renderForceInputCards();
+            updatePhysics();
+        }
+
+        function updateForceParam(id, key, value) {
+            const force = forces.find(f => f.id === id);
+            if (force) {
+                if (key === 'dir') {
+                    force.dir = value; // 'down' or 'up'
+                } else {
+                    let parsedVal = parseFloat(value);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+                    
+                    if (key === 'x') {
+                        parsedVal = Math.max(0, Math.min(beamLength, parsedVal));
+                    } else if (key === 'F') {
+                        parsedVal = Math.max(0, parsedVal);
+                    } else if (key === 'angle') {
+                        parsedVal = Math.max(10, Math.min(170, parsedVal));
+                    }
+
+                    force[key] = parsedVal;
+
+                    const sliderEl = document.getElementById(`slider-${key}-${id}`);
+                    const inputEl = document.getElementById(`input-${key}-${id}`);
+                    if (sliderEl) sliderEl.value = parsedVal;
+                    if (inputEl && document.activeElement !== inputEl) inputEl.value = parsedVal;
+                }
+
+                updatePhysics();
+            }
+        }
+
+        function snapPivotToCoG() {
+            let totalFx = 0;
+            let totalF = 0;
+
+            forces.forEach(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+
+                totalFx += dirSign * Fy * f.x;
+                totalF += dirSign * Fy;
+            });
+
+            if (Math.abs(totalF) > 0.001) {
+                let cogX = totalFx / totalF;
+                pivotPos = parseFloat(cogX.toFixed(2));
+                document.getElementById('slider-pivot').value = pivotPos;
+                updatePhysics();
+            }
+        }
+
+        function renderForceInputCards() {
+            const container = document.getElementById('forces-input-container');
+            let html = '';
+
+            forces.sort((a, b) => a.x - b.x);
+
+            forces.forEach((f, index) => {
+                let isUp = f.dir === 'up';
+                let isAngled = f.angle !== 90;
+                let perpF = (f.F * Math.sin((f.angle * Math.PI) / 180)).toFixed(1);
+
+                html += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative">
+                        <div class="flex items-center justify-between font-bold text-xs border-b border-slate-200/60 pb-1.5">
+                            <span class="text-indigo-900 flex items-center gap-1.5">
+                                <i class="fa-solid ${isUp ? 'fa-arrow-up text-blue-600' : 'fa-arrow-down text-rose-500'}"></i> Force F<sub>${index + 1}</sub>
+                            </span>
+
+                            <div class="flex items-center gap-2">
+                                <!-- Upward / Downward Direction Selector -->
+                                <select onchange="updateForceParam(${f.id}, 'dir', this.value)" 
+                                        class="bg-white border font-bold text-[11px] rounded px-1.5 py-0.5 ${isUp ? 'text-blue-700 border-blue-400' : 'text-rose-700 border-rose-400'} focus:outline-none cursor-pointer">
+                                    <option value="down" ${!isUp ? 'selected' : ''}>↓ Downward</option>
+                                    <option value="up" ${isUp ? 'selected' : ''}>↑ Upward</option>
+                                </select>
+                                <button onclick="removeForce(${f.id})" class="text-rose-500 hover:text-rose-700 text-xs px-1" title="Delete Force">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 text-xs">
+                            <!-- Force Magnitude (F) -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Force (F):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-F-${f.id}" min="0" max="1000" step="1" value="${f.F}"
+                                               class="w-12 bg-white border border-rose-300 font-bold text-rose-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'F', this.value)">
+                                        <span class="font-bold text-rose-600">N</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-F-${f.id}" min="1" max="200" value="${f.F}" step="1"
+                                       class="w-full accent-rose-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'F', this.value)">
+                            </div>
+
+                            <!-- Angle (theta) -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Angle (&theta;):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-angle-${f.id}" min="10" max="170" step="1" value="${f.angle}"
+                                               class="w-12 bg-white border border-amber-300 font-bold text-amber-700 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'angle', this.value)">
+                                        <span class="font-bold text-amber-700">&deg;</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-angle-${f.id}" min="10" max="170" value="${f.angle}" step="1"
+                                       class="w-full accent-amber-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'angle', this.value)">
+                            </div>
+
+                            <!-- Distance (x) -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Distance:</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-x-${f.id}" min="0" max="${beamLength}" step="0.1" value="${f.x.toFixed(1)}"
+                                               class="w-12 bg-white border border-blue-300 font-bold text-blue-600 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'x', this.value)">
+                                        <span class="font-bold text-blue-600">m</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-x-${f.id}" min="0" max="${beamLength}" value="${f.x}" step="0.1"
+                                       class="w-full accent-blue-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'x', this.value)">
+                            </div>
+                        </div>
+
+                        ${isAngled ? `
+                            <div class="text-[10px] text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 flex justify-between font-mono-code font-bold">
+                                <span>Perpendicular F<sub>&perp;</sub> = F sin(${f.angle}&deg;)</span>
+                                <span>${perpF} N</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function getLeftAbsPos(distFromDatum) {
+            return datumSide === 'left' ? distFromDatum : (beamLength - distFromDatum);
+        }
+
+        function updatePhysics() {
+            pivotPos = parseFloat(document.getElementById('slider-pivot').value) || 0;
+            document.getElementById('val-pivot-display').innerText = `${pivotPos.toFixed(2)} m`;
+
+            const sideName = datumSide === 'left' ? 'Left End' : 'Right End';
+            document.getElementById('lbl-pivot-start').innerText = `0m (${sideName})`;
+            document.getElementById('lbl-pivot-mid').innerText = `${(beamLength/2).toFixed(1)}m`;
+            document.getElementById('lbl-pivot-end').innerText = `${beamLength}m`;
+
+            const datumLabel = datumSide === 'left' ? 'LEFT END (x = 0.0 m)' : 'RIGHT END (x = 0.0 m)';
+            document.getElementById('overlay-datum-badge').innerHTML = `<span>REFERENCE POINT: ${datumLabel}</span>`;
+
+            let totalFx = 0;
+            let totalF = 0;
+
+            forces.forEach(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+
+                totalFx += dirSign * Fy * f.x;
+                totalF += dirSign * Fy;
+            });
+
+            let cogX = Math.abs(totalF) > 0.001 ? (totalFx / totalF) : 0;
+            targetTiltAngle = 0;
+
+            document.getElementById('metric-total-f').innerText = `${totalF.toFixed(1)} N`;
+            document.getElementById('metric-total-m').innerText = `${totalFx.toFixed(1)} N·m`;
+            document.getElementById('metric-cog').innerText = `${cogX.toFixed(2)} m`;
+            document.getElementById('metric-pivot').innerText = `${pivotPos.toFixed(2)} m`;
+
+            const badge = document.getElementById('badge-cog-status');
+            if (badge) {
+                badge.innerHTML = `<i class="fa-solid fa-location-dot text-amber-600"></i> CoG Position (x = ${cogX.toFixed(2)} m)`;
+            }
+
+            renderMethod1MathSteps(cogX, totalFx, totalF);
+        }
+
+        function renderMethod1MathSteps(cogX, totalFx, totalF) {
+            const container = document.getElementById('math-steps-container');
+            let datumText = datumSide === 'left' ? 'Left End' : 'Right End';
+
+            let sortedForces = forces.slice().sort((a, b) => a.x - b.x);
+
+            // Group moments relative to pivot/CoG O at distance x
+            // Downward force left of O (x_i < x) -> CCW
+            // Downward force right of O (x_i >= x) -> CW
+            // Upward force left of O (x_i < x) -> CW
+            // Upward force right of O (x_i >= x) -> CCW
+            let acwTermsArr = [];
+            let cwTermsArr = [];
+            let acwExpandedArr = [];
+            let cwExpandedArr = [];
+
+            let leftCoefX = 0, leftConst = 0;
+            let rightCoefX = 0, rightConst = 0;
+
+            sortedForces.forEach(f => {
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let fStr = f.angle !== 90 ? `(${f.F}&middot;sin${f.angle}&deg;)` : `${f.F}`;
+
+                let isDownward = f.dir !== 'up';
+
+                if ((isDownward && f.x < cogX) || (!isDownward && f.x >= cogX)) {
+                    // CCW moment term
+                    if (f.x < cogX) {
+                        acwTermsArr.push(`${fStr}(x - ${f.x.toFixed(1)})`);
+                        acwExpandedArr.push(`${Fy.toFixed(1)}x - ${(Fy * f.x).toFixed(1)}`);
+                        leftCoefX += Fy;
+                        leftConst += Fy * f.x;
+                    } else {
+                        acwTermsArr.push(`${fStr}(${f.x.toFixed(1)} - x)`);
+                        acwExpandedArr.push(`${(Fy * f.x).toFixed(1)} - ${Fy.toFixed(1)}x`);
+                        rightCoefX += Fy;
+                        rightConst += Fy * f.x;
+                    }
+                } else {
+                    // CW moment term
+                    if (f.x >= cogX) {
+                        cwTermsArr.push(`${fStr}(${f.x.toFixed(1)} - x)`);
+                        cwExpandedArr.push(`${(Fy * f.x).toFixed(1)} - ${Fy.toFixed(1)}x`);
+                        rightCoefX += Fy;
+                        rightConst += Fy * f.x;
+                    } else {
+                        cwTermsArr.push(`${fStr}(x - ${f.x.toFixed(1)})`);
+                        cwExpandedArr.push(`${Fy.toFixed(1)}x - ${(Fy * f.x).toFixed(1)}`);
+                        leftCoefX += Fy;
+                        leftConst += Fy * f.x;
+                    }
+                }
+            });
+
+            let acwTerms = acwTermsArr.join(' + ') || '0';
+            let cwTerms = cwTermsArr.join(' + ') || '0';
+            let acwExpanded = acwExpandedArr.join(' + ') || '0';
+            let cwExpanded = cwExpandedArr.join(' + ') || '0';
+
+            let totalCoeffX = leftCoefX + rightCoefX;
+            let totalConstSum = leftConst + rightConst;
+
+            let html = `
+                <div class="bg-indigo-50/80 p-3 rounded-xl border border-indigo-200 space-y-1">
+                    <div class="font-bold text-indigo-950">1. Assume Center of Gravity is at Point O:</div>
+                    <div class="text-slate-800">
+                        Let x = Distance of Center of Gravity O from <strong class="text-indigo-900">${datumText}</strong>.
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-blue-900">2. Principle of Moment of Force (&Sigma; M<sub>ccw</sub> = &Sigma; M<sub>cw</sub>):</div>
+                    <div class="text-slate-800 overflow-x-auto py-1 text-[11px]">
+                        ${acwTerms} = ${cwTerms}
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-emerald-900">3. Expand Equation Brackets:</div>
+                    <div class="text-slate-800 overflow-x-auto py-1 text-[11px]">
+                        ${acwExpanded} = ${cwExpanded}
+                    </div>
+                    <div class="text-[11px] text-slate-600">
+                        (${leftCoefX.toFixed(1)}x - ${leftConst.toFixed(1)}) = (${rightConst.toFixed(1)} - ${rightCoefX.toFixed(1)}x)
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/80 p-3 rounded-xl border border-amber-200 space-y-1">
+                    <div class="font-bold text-amber-950">4. Group x Terms & Solve for x:</div>
+                    <div class="text-slate-800">
+                        ${leftCoefX.toFixed(1)}x + ${rightCoefX.toFixed(1)}x = ${rightConst.toFixed(1)} + ${leftConst.toFixed(1)}
+                    </div>
+                    <div class="text-slate-800 font-bold">
+                        ${totalCoeffX.toFixed(1)}x = ${totalConstSum.toFixed(1)}
+                    </div>
+                    <div class="text-amber-900 text-sm font-extrabold mt-1">
+                        x = ${totalConstSum.toFixed(1)} / ${totalCoeffX.toFixed(1)} = <span class="bg-amber-200 px-2 py-0.5 rounded text-slate-950">${cogX.toFixed(2)} m</span> (from ${datumText})
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function animateLoop() {
+            beamTiltAngle += (targetTiltAngle - beamTiltAngle) * 0.1;
+            drawCanvasScene();
+            requestAnimationFrame(animateLoop);
+        }
+
+        function drawCanvasScene() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const w = canvas.width;
+            const h = canvas.height;
+
+            const marginX = w * 0.12;
+            const beamWidthPx = w - marginX * 2;
+            const beamYPx = h * 0.46;
+
+            const pivotAbsLeft = getLeftAbsPos(pivotPos);
+            const pivotPx = marginX + (pivotAbsLeft / beamLength) * beamWidthPx;
+
+            // 1. Distance Scale Ruler
+            const rulerY = h - 35;
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(marginX, rulerY);
+            ctx.lineTo(marginX + beamWidthPx, rulerY);
+            ctx.stroke();
+
+            ctx.fillStyle = '#64748b';
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+
+            let step = beamLength <= 10 ? 2 : (beamLength <= 15 ? 3 : 4);
+            for (let i = 0; i <= beamLength; i += step) {
+                let physicalX = datumSide === 'left' ? i : (beamLength - i);
+                let markPx = marginX + (physicalX / beamLength) * beamWidthPx;
+
+                ctx.beginPath();
+                ctx.moveTo(markPx, rulerY - 5);
+                ctx.lineTo(markPx, rulerY + 5);
+                ctx.stroke();
+                ctx.fillText(`${i}m`, markPx, rulerY + 17);
+            }
+
+            // Datum Anchor Pin Indicator
+            let datumPx = datumSide === 'left' ? marginX : (marginX + beamWidthPx);
+            ctx.fillStyle = '#3b82f6';
+            ctx.beginPath();
+            ctx.arc(datumPx, rulerY, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 2. Triangular Fulcrum / Pivot O
+            const fulcrumHeight = 36;
+            const fulcrumWidth = 30;
+
+            ctx.fillStyle = '#d97706';
+            ctx.strokeStyle = '#78350f';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.moveTo(pivotPx, beamYPx);
+            ctx.lineTo(pivotPx - fulcrumWidth / 2, beamYPx + fulcrumHeight);
+            ctx.lineTo(pivotPx + fulcrumWidth / 2, beamYPx + fulcrumHeight);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'extrabold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('O', pivotPx, beamYPx + fulcrumHeight - 8);
+
+            // 3. Beam AB
+            ctx.save();
+            ctx.translate(pivotPx, beamYPx);
+
+            const leftOffsetPx = -((pivotAbsLeft / beamLength) * beamWidthPx);
+
+            ctx.fillStyle = '#f8fafc';
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 2.5;
+
+            ctx.beginPath();
+            ctx.roundRect(leftOffsetPx, -6, beamWidthPx, 12, 4);
+            ctx.fill();
+            ctx.stroke();
+
+            // Calculate CoG Position
+            let totalFx = 0, totalF = 0;
+            forces.forEach(f => { 
+                let rad = (f.angle * Math.PI) / 180;
+                let Fy = f.F * Math.sin(rad);
+                let dirSign = f.dir === 'up' ? -1 : 1;
+                totalFx += dirSign * Fy * f.x; 
+                totalF += dirSign * Fy; 
+            });
+            let cogX = Math.abs(totalF) > 0.001 ? (totalFx / totalF) : (beamLength / 2);
+            let cogAbsLeft = getLeftAbsPos(cogX);
+            let cogOffsetPx = ((cogAbsLeft - pivotAbsLeft) / beamLength) * beamWidthPx;
+
+            // 4. Force offsets calculation
+            let forceOffsets = forces.map((f, idx) => {
+                let fAbsLeft = getLeftAbsPos(f.x);
+                let pxOffset = ((fAbsLeft - pivotAbsLeft) / beamLength) * beamWidthPx;
+                let arrowLen = Math.max((f.F / 100) * 45, 26);
+                return { id: f.id, originalIdx: idx, F: f.F, x: f.x, dir: f.dir || 'down', angle: f.angle || 90, pxOffset, arrowLen, labelYTier: 0 };
+            }).sort((a, b) => a.pxOffset - b.pxOffset);
+
+            const minLabelDistancePx = 52;
+            for (let i = 1; i < forceOffsets.length; i++) {
+                let prev = forceOffsets[i - 1];
+                let curr = forceOffsets[i];
+                if (Math.abs(curr.pxOffset - prev.pxOffset) < minLabelDistancePx) {
+                    curr.labelYTier = (prev.labelYTier + 1) % 2;
+                }
+            }
+
+            let cogCloseToForce = forceOffsets.some(item => Math.abs(item.pxOffset - cogOffsetPx) < 40);
+            let cogLabelY = cogCloseToForce ? -62 : -28;
+
+            // Center of Gravity Line
+            ctx.strokeStyle = '#eab308';
+            ctx.lineWidth = 2.5;
+            ctx.setLineDash([4, 3]);
+            ctx.beginPath();
+            ctx.moveTo(cogOffsetPx, cogLabelY + 12);
+            ctx.lineTo(cogOffsetPx, 22);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // CoG Badge Label
+            const cogText = `CoG (x=${cogX.toFixed(2)}m)`;
+            ctx.font = 'bold 10px "Plus Jakarta Sans"';
+            const cogMetrics = ctx.measureText(cogText);
+            
+            ctx.fillStyle = '#fef08a';
+            ctx.strokeStyle = '#ca8a04';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.roundRect(cogOffsetPx - cogMetrics.width / 2 - 4, cogLabelY - 10, cogMetrics.width + 8, 14, 3);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#854d0e';
+            ctx.textAlign = 'center';
+            ctx.fillText(cogText, cogOffsetPx, cogLabelY + 1);
+
+            // 5. Draw Force Vectors F_i (Supporting Angles and Up/Down Direction)
+            forceOffsets.forEach((item) => {
+                let forceOffsetPx = item.pxOffset;
+                let arrowLen = item.arrowLen;
+                let labelExtraOffset = item.labelYTier * 18;
+                let isUp = item.dir === 'up';
+
+                let thetaRad = (item.angle * Math.PI) / 180;
+                let dx = arrowLen * Math.cos(thetaRad);
+                let dy = Math.max(arrowLen * Math.sin(thetaRad), 12);
+
+                let endX = forceOffsetPx;
+                let endY = isUp ? 6 : -6;
+
+                let startX = forceOffsetPx + dx;
+                let startY = isUp ? (endY + dy + labelExtraOffset) : (endY - (dy + labelExtraOffset));
+
+                let color = isUp ? '#2563eb' : '#dc2626';
+
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2.8;
+
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                let headAngle = Math.atan2(endY - startY, endX - startX);
+                const headLen = 8;
+                ctx.beginPath();
+                ctx.moveTo(endX, endY);
+                ctx.lineTo(endX - headLen * Math.cos(headAngle - Math.PI / 6), endY - headLen * Math.sin(headAngle - Math.PI / 6));
+                ctx.lineTo(endX - headLen * Math.cos(headAngle + Math.PI / 6), endY - headLen * Math.sin(headAngle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                // Label Badge
+                const labelText = `F${item.originalIdx + 1} = ${item.F}N${item.angle !== 90 ? ` (${item.angle}°)` : ''}`;
+                ctx.font = 'bold 10.5px "Plus Jakarta Sans"';
+                const metrics = ctx.measureText(labelText);
+                const padX = 4;
+                const labelY = startY + (isUp ? 14 : -6);
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(startX - metrics.width / 2 - padX, labelY - 12, metrics.width + padX * 2, 14, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = color;
+                ctx.textAlign = 'center';
+                ctx.fillText(labelText, startX, labelY - 2);
+            });
+
+            // 6. Question Dimension Arrows
+            const showDimensions = document.getElementById('chk-show-dimensions')?.checked ?? true;
+
+            if (showDimensions) {
+                let sortedForces = forces.slice().sort((a, b) => a.x - b.x);
+                const dimStepY = 13;
+
+                sortedForces.forEach((f, idx) => {
+                    let forceAbsLeft = getLeftAbsPos(f.x);
+                    let forceOffsetPx = ((forceAbsLeft - pivotAbsLeft) / beamLength) * beamWidthPx;
+                    let datumOffsetPx = datumSide === 'left' ? leftOffsetPx : (leftOffsetPx + beamWidthPx);
+
+                    let dimY = 18 + (idx * dimStepY);
+
+                    ctx.strokeStyle = '#2563eb';
+                    ctx.fillStyle = '#2563eb';
+                    ctx.lineWidth = 1.1;
+
+                    ctx.beginPath();
+                    ctx.moveTo(datumOffsetPx, dimY);
+                    ctx.lineTo(forceOffsetPx, dimY);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(datumOffsetPx, dimY - 3);
+                    ctx.lineTo(datumOffsetPx, dimY + 3);
+                    ctx.moveTo(forceOffsetPx, dimY - 3);
+                    ctx.lineTo(forceOffsetPx, dimY + 3);
+                    ctx.stroke();
+
+                    if (Math.abs(forceOffsetPx - datumOffsetPx) > 14) {
+                        let dir = forceOffsetPx > datumOffsetPx ? 1 : -1;
+                        ctx.beginPath();
+                        ctx.moveTo(forceOffsetPx, dimY);
+                        ctx.lineTo(forceOffsetPx - dir * 4.5, dimY - 2.5);
+                        ctx.lineTo(forceOffsetPx - dir * 4.5, dimY + 2.5);
+                        ctx.closePath();
+                        ctx.fill();
+                    }
+
+                    const forceOriginalIndex = forces.findIndex(item => item.id === f.id) + 1;
+                    const dimLabel = `x${forceOriginalIndex} = ${f.x.toFixed(1)}m`;
+                    ctx.font = 'bold 8.5px "Plus Jakarta Sans"';
+                    const textWidth = ctx.measureText(dimLabel).width;
+
+                    let midX = (datumOffsetPx + forceOffsetPx) / 2;
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                    ctx.fillRect(midX - textWidth / 2 - 2, dimY - 4.5, textWidth + 4, 9);
+
+                    ctx.fillStyle = '#1d4ed8';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(dimLabel, midX, dimY + 2.5);
+                });
+            }
+
+            ctx.restore();
+        }
+    </script>
+</body>
+</html>
