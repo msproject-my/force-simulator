@@ -96,6 +96,11 @@
                     <input id="maxForceInput" type="number" min="10" max="1000" step="10" value="200" class="w-16 bg-white text-[#1d428a] border-2 border-[#1d428a] rounded-xl px-1.5 py-0.5 text-center font-mono-num font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-400">
                     <span class="font-bold text-blue-200">N</span>
                 </div>
+
+                <!-- Home Button -->
+                <a href="index.html" class="bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-bold px-3.5 py-2 rounded-2xl border-2 border-[#1e40af] shadow-md transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-house"></i> Home
+                </a>
                 
                 <button id="resetBtn" class="bg-[#f43f5e] hover:bg-[#e11d48] text-white text-xs font-bold px-3.5 py-2 rounded-2xl border-2 border-[#881337] shadow-md transition flex items-center gap-1.5">
                     <i class="fa-solid fa-rotate-right"></i> Reset
@@ -115,7 +120,6 @@
                 <span class="font-heading text-[#1d428a] text-lg font-bold flex items-center gap-2">
                     <i class="fa-solid fa-shapes text-[#f59e0b]"></i> Cartesian Plane & Quadrants
                 </span>
-              
             </div>
 
             <!-- Canvas Wrapper -->
@@ -140,7 +144,7 @@
                 <!-- Canvas Bottom Hint -->
                 <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur text-slate-800 text-[11px] md:text-xs px-3.5 py-2 rounded-2xl border-2 border-slate-800 flex items-center justify-between pointer-events-none shadow-md font-semibold">
                     <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-[#1d428a] fa-hand-pointer text-[#1d428a] animate-bounce text-sm"></i> 
+                        <i class="fa-solid fa-hand-pointer text-[#1d428a] animate-bounce text-sm"></i> 
                         Drag the arrow to rotate & adjust length of F. Double-tap/click arrow to toggle direction (pointing IN/OUT).
                     </span>
                 </div>
