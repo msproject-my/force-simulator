@@ -4,883 +4,859 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Resultant Force Simulator</title>
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Inter & JetBrains Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
+        
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f3f7;
-            color: #1e293b;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f0f4f9;
+        }
+        
+        .font-heading {
+            font-family: 'Fredoka', cursive, sans-serif;
         }
 
-        .math-font {
+        .font-mono-code {
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Frame container matching screenshot aesthetic */
-        .framed-card {
-            border: 3px solid #1e3a8a;
-            border-radius: 1.5rem;
-            background-color: #ffffff;
-            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.1);
-        }
-
-        .framed-inner-card {
+        .canvas-container {
+            position: relative;
+            background: radial-gradient(circle, #ffffff 0%, #f1f5f9 100%);
             border: 2px solid #cbd5e1;
-            border-radius: 1rem;
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.04);
+            touch-action: none;
         }
 
-        /* Custom scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f5f9;
-            border-radius: 8px;
         }
         ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
-            border-radius: 8px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-
-        canvas {
-            touch-action: none;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="min-h-screen pb-12 flex flex-col justify-between">
+<body class="text-slate-800 min-h-screen flex flex-col">
 
-    <!-- Top Header Bar -->
-    <header class="bg-blue-950 text-white shadow-lg border-b-4 border-blue-800">
-        <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 flex flex-wrap items-center justify-between gap-3">
+    <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-amber-400 text-blue-950 flex items-center justify-center font-extrabold text-xl shadow-md">
-                    <i class="fa-solid fa-lightbulb"></i>
+                <div class="bg-amber-400/20 p-2.5 rounded-xl border border-amber-400/30 backdrop-blur-sm">
+                    <i class="fa-solid fa-diagram-project text-xl text-amber-400"></i>
                 </div>
                 <div>
-                    <h1 class="font-black text-lg sm:text-xl tracking-tight leading-tight uppercase">
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-wide uppercase text-white flex items-center gap-2">
                         INTERACTIVE RESULTANT FORCE SIMULATOR
                     </h1>
-                    <p class="text-xs text-blue-200 font-medium">
-                        Resolve multiple concurrent forces into horizontal (Fx) and vertical (Fy) components with real-time visualization.
-                    </p>
+                    <p class="text-[11px] text-slate-300">Resolve multiple concurrent forces into horizontal (Fx) and vertical (Fy) components with real-time visualization.</p>
                 </div>
             </div>
-
-            <!-- Global Controls -->
-            <div class="flex items-center space-x-3">
-                <div class="bg-blue-900/80 border border-blue-700 px-3 py-1.5 rounded-xl flex items-center space-x-2 text-xs">
-                    <span class="font-bold text-amber-300">F<sub>max</sub>:</span>
-                    <input id="fmaxInput" type="number" min="50" max="1000" step="50" value="200" 
-                        class="w-16 bg-white text-blue-950 font-black rounded px-1.5 py-0.5 text-center focus:outline-none focus:ring-2 focus:ring-amber-400">
-                    <span class="font-bold text-blue-200">N</span>
+            
+            <!-- Right Actions Widget -->
+            <div class="flex flex-wrap items-center gap-3">
+                <!-- Fmax Input Widget -->
+                <div class="bg-indigo-950/80 px-3 py-1.5 rounded-xl border border-indigo-700/50 flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-300 font-mono-code">F<sub>max</sub>:</span>
+                    <input type="number" id="input-fmax" value="200" min="50" max="1000" step="10" 
+                           class="w-16 bg-slate-900 border border-indigo-500/50 text-white font-bold text-xs px-2 py-1 rounded text-center focus:outline-none focus:ring-1 focus:ring-amber-400 font-mono-code"
+                           onchange="updateFmax(this.value)">
+                    <span class="text-xs font-bold text-slate-400 font-mono-code">N</span>
                 </div>
-                
+
                 <!-- Home Button -->
-                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs shadow-md transition-all flex items-center space-x-1">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Home</span>
+                <a href="index.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-house"></i> Home
                 </a>
 
-                <button id="resetBtn" class="bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs shadow-md transition-all flex items-center space-x-1">
-                    <i class="fa-solid fa-rotate-right"></i>
-                    <span>Reset</span>
+                <!-- Reset Button -->
+                <button onclick="resetSimulator()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm cursor-pointer">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 w-full space-y-6">
-
-        <!-- Top Grid: Interactive Canvas & Force Management List -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <main class="max-w-7xl mx-auto px-4 py-5 flex-grow w-full space-y-5">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
             
-            <!-- Left Column: Cartesian Plane Canvas -->
-            <div class="lg:col-span-7 framed-card p-4 sm:p-5 flex flex-col justify-between">
-                
-                <!-- Canvas Top Bar -->
-                <div class="flex flex-wrap items-center justify-between pb-3 mb-2 border-b border-slate-200 gap-2">
-                    <div class="flex items-center space-x-2">
-                        <i class="fa-solid fa-shapes text-amber-500 text-lg"></i>
-                        <h2 class="font-extrabold text-blue-950 text-base">Cartesian Plane & Vectors</h2>
-                    </div>
-
-                    <!-- Visual Mode Switcher -->
-                    <div class="flex items-center space-x-1 bg-slate-100 p-1 rounded-xl border border-slate-300 text-xs font-bold">
-                        <button id="modeConcurrentBtn" class="px-2.5 py-1 rounded-lg bg-blue-950 text-white shadow-sm transition-all">
+            <!-- LEFT COLUMN (LG: COL-7): CARTESIAN PLANE & INTERACTIVE VECTORS -->
+            <div class="lg:col-span-7 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-compass text-amber-500"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Cartesian Plane & Vectors</h2>
+                        </div>
+                        <span class="bg-indigo-900 text-white font-bold text-[11px] px-3 py-1 rounded-lg border border-indigo-700">
                             Concurrent (Origin)
-                        </button>
-                        
-                    </div>
-                </div>
-
-                <!-- Canvas Display Container -->
-                <div class="relative w-full aspect-square max-h-[520px] bg-slate-50 border-2 border-slate-200 rounded-2xl overflow-hidden shadow-inner flex items-center justify-center">
-                    <canvas id="vectorCanvas" class="w-full h-full cursor-crosshair"></canvas>
-
-                    <!-- Instruction Overlay Footer -->
-                    <div class="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur border border-slate-300 text-slate-700 text-[11px] sm:text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center justify-between z-10">
-                        <span class="flex items-center gap-1.5 font-semibold">
-                            <i class="fa-regular fa-hand-pointer text-amber-600 text-sm"></i>
-                            Drag any arrow tip to adjust magnitude (F) & angle (&theta;).
                         </span>
-                        <span id="canvasModeLabel" class="font-bold text-blue-900 hidden sm:inline bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                    </div>
+
+                    <div class="canvas-container rounded-xl overflow-hidden h-[380px] sm:h-[420px] flex items-center justify-center relative cursor-crosshair">
+                        <canvas id="vectorCanvas" class="w-full h-full block"></canvas>
+                    </div>
+
+                    <div class="mt-2.5 bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-xs text-slate-600 flex items-center justify-between">
+                        <span class="flex items-center gap-1.5 font-semibold text-[11px]">
+                            <i class="fa-solid fa-hand-pointer text-indigo-500"></i> Drag any vector handle on canvas to adjust magnitude (F) & angle (&theta;).
+                        </span>
+                        <span class="bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded text-[10px]">
                             Mode: Concurrent
                         </span>
                     </div>
                 </div>
-
             </div>
 
-            <!-- Right Column: Force Controls & List -->
-            <div class="lg:col-span-5 framed-card p-4 sm:p-5 flex flex-col justify-between self-stretch">
+            <!-- RIGHT COLUMN (LG: COL-5): ACTIVE FORCE LIST -->
+            <div class="lg:col-span-5 bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 flex flex-col justify-between space-y-4">
                 <div>
-                    <!-- Panel Header -->
-                    <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-200">
-                        <div class="flex items-center space-x-2">
-                            <i class="fa-solid fa-sliders text-blue-700 text-lg"></i>
-                            <h2 class="font-extrabold text-blue-950 text-base">Active Force List</h2>
+                    <div class="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-indigo-600"></i>
+                            <h2 class="font-bold text-slate-800 text-sm">Active Force List</h2>
                         </div>
-                        <button id="addForceBtn" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold px-3.5 py-1.5 rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5">
+                        <button onclick="addForce()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition flex items-center gap-1 shadow-sm cursor-pointer">
                             <i class="fa-solid fa-plus"></i> Add Force
                         </button>
                     </div>
 
-                    <!-- Forces Dynamic Scroll Container -->
-                    <div id="forcesContainer" class="space-y-3 max-h-[430px] overflow-y-auto pr-1">
-                        <!-- Dynamic Force Cards injected here via JS -->
+                    <div id="forces-input-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-1">
+                        <!-- Dynamic Force Cards injected via JS -->
                     </div>
                 </div>
 
-                <!-- Guidance Info Box -->
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-900 space-y-1.5">
-                    <div class="flex justify-between items-center font-extrabold">
-                        <span>Total Active Forces:</span>
-                        <span id="forceCountBadge" class="bg-blue-950 text-white px-2.5 py-0.5 rounded-full text-xs">2 Forces</span>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs flex items-center justify-between">
+                    <div>
+                        <span class="font-bold text-slate-700 block">Total Active Forces:</span>
+                        <p class="text-[10px] text-slate-500 leading-tight">
+                            * <strong>OUTWARD (OUT)</strong> acts away from origin (Tension/Pull).<br>
+                            * <strong>INWARD (IN)</strong> acts towards origin (Compression/Push).
+                        </p>
                     </div>
-                    <p class="text-[11px] text-slate-600 leading-tight">
-                        * <strong>OUTWARD (OUT)</strong> acts away from origin (Tension/Pull). <br>
-                        * <strong>INWARD (IN)</strong> acts towards origin (Compression/Push).
-                    </p>
+                    <span id="badge-force-count" class="bg-indigo-950 text-amber-400 font-extrabold text-xs px-3 py-1 rounded-full border border-indigo-800 whitespace-nowrap">
+                        2 Forces
+                    </span>
                 </div>
             </div>
 
         </div>
 
-        <!-- Lower Section: Resultant Calculation Results -->
-        <div class="framed-card p-4 sm:p-6 space-y-6">
-            
-            <!-- Section Title -->
-            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-calculator text-emerald-600 text-xl"></i>
-                    <h2 class="font-black text-blue-950 text-lg">Force Calculation Results</h2>
+        <div class="bg-white rounded-2xl p-4 shadow-sm border-2 border-indigo-100 space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-square-poll-vertical text-emerald-600 text-lg"></i>
+                    <h2 class="font-bold text-slate-800 text-sm sm:text-base">Force Calculation Results</h2>
                 </div>
-                <span class="bg-emerald-100 text-emerald-800 font-extrabold px-3 py-1 rounded-full text-xs flex items-center gap-1">
-                    <i class="fa-solid fa-bolt text-amber-500"></i> Real-time Output
+                <span class="bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+                    <i class="fa-solid fa-bolt text-emerald-600"></i> Real-time Output
                 </span>
             </div>
 
-            <!-- Top 4 Highlight Stat Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Stat 1: Sum Fx -->
-                <div class="p-4 rounded-2xl bg-blue-50 border-2 border-blue-300 flex flex-col justify-between">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-blue-800">X-Component (&Sigma;F<sub>x</sub>)</span>
-                    <div class="my-2">
-                        <span id="statFx" class="text-2xl font-black text-blue-950 math-font">+0.00 N</span>
-                    </div>
-                    <span id="statFxDir" class="text-xs font-bold text-blue-700">Direction: Right (+X)</span>
+            <!-- 4 Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- Card 1: Total X-Component (Fx) -->
+                <div class="bg-blue-50/60 border-2 border-blue-200 rounded-xl p-3.5 flex flex-col justify-between">
+                    <span class="text-[11px] font-bold text-blue-700 uppercase tracking-wider">X-COMPONENT (&Sigma;F<sub>x</sub>)</span>
+                    <div id="metric-fx-val" class="text-2xl font-extrabold text-blue-900 my-1 font-mono-code">+15.57 N</div>
+                    <span id="metric-fx-dir" class="text-xs font-semibold text-blue-600">Direction: Right (+X)</span>
                 </div>
 
-                <!-- Stat 2: Sum Fy -->
-                <div class="p-4 rounded-2xl bg-emerald-50 border-2 border-emerald-300 flex flex-col justify-between">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-emerald-800">Y-Component (&Sigma;F<sub>y</sub>)</span>
-                    <div class="my-2">
-                        <span id="statFy" class="text-2xl font-black text-emerald-950 math-font">+0.00 N</span>
-                    </div>
-                    <span id="statFyDir" class="text-xs font-bold text-emerald-700">Direction: Upward (+Y)</span>
+                <!-- Card 2: Total Y-Component (Fy) -->
+                <div class="bg-emerald-50/60 border-2 border-emerald-200 rounded-xl p-3.5 flex flex-col justify-between">
+                    <span class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider">Y-COMPONENT (&Sigma;F<sub>y</sub>)</span>
+                    <div id="metric-fy-val" class="text-2xl font-extrabold text-emerald-900 my-1 font-mono-code">+124.85 N</div>
+                    <span id="metric-fy-dir" class="text-xs font-semibold text-emerald-600">Direction: Upward (+Y)</span>
                 </div>
 
-                <!-- Stat 3: Resultant Force FR -->
-                <div class="p-4 rounded-2xl bg-amber-50 border-2 border-amber-300 flex flex-col justify-between">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-amber-800">Resultant Force (F<sub>R</sub>)</span>
-                    <div class="my-2">
-                        <span id="statFr" class="text-2xl font-black text-amber-950 math-font">0.00 N</span>
-                    </div>
-                    <span class="text-xs font-bold text-amber-700">Magnitude of Vector F<sub>R</sub></span>
+                <!-- Card 3: Resultant Force (Fr) -->
+                <div class="bg-amber-50/60 border-2 border-amber-200 rounded-xl p-3.5 flex flex-col justify-between">
+                    <span class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">RESULTANT FORCE (F<sub>R</sub>)</span>
+                    <div id="metric-fr-val" class="text-2xl font-extrabold text-amber-900 my-1 font-mono-code">125.82 N</div>
+                    <span class="text-xs font-semibold text-amber-600">Magnitude of Vector F<sub>R</sub></span>
                 </div>
 
-                <!-- Stat 4: Direction Angle Theta -->
-                <div class="p-4 rounded-2xl bg-purple-50 border-2 border-purple-300 flex flex-col justify-between">
-                    <span class="text-[11px] font-black uppercase tracking-wider text-purple-800">Direction Angle (&theta;<sub>R</sub>)</span>
-                    <div class="my-2">
-                        <span id="statTheta" class="text-2xl font-black text-purple-950 math-font">0.0&deg;</span>
-                    </div>
-                    <span id="statQuad" class="text-xs font-bold text-purple-700">QUADRANT I</span>
+                <!-- Card 4: Direction Angle (θ_R) -->
+                <div class="bg-purple-50/60 border-2 border-purple-200 rounded-xl p-3.5 flex flex-col justify-between">
+                    <span class="text-[11px] font-bold text-purple-700 uppercase tracking-wider">DIRECTION ANGLE (&theta;<sub>R</sub>)</span>
+                    <div id="metric-theta-val" class="text-2xl font-extrabold text-purple-900 my-1 font-mono-code">82.9°</div>
+                    <span id="metric-quadrant-tag" class="text-xs font-semibold text-purple-600 uppercase">QUADRANT I</span>
                 </div>
             </div>
 
-            <!-- Individual Force Resolution Breakdown Table -->
-            <div class="framed-inner-card p-4 bg-slate-50/70 overflow-x-auto">
-                <h3 class="text-xs font-extrabold text-blue-950 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-table-list text-slate-600"></i>
-                    Individual Force Vector Component Breakdown Table:
-                </h3>
-                <table class="w-full text-xs text-left text-slate-800 border-collapse min-w-[600px]">
-                    <thead>
-                        <tr class="bg-blue-950 text-white font-bold uppercase border-b border-blue-900">
-                            <th class="py-2.5 px-3 rounded-l-lg">Force Vector</th>
-                            <th class="py-2.5 px-3">Magnitude (F)</th>
-                            <th class="py-2.5 px-3">Angle (&theta;)</th>
-                            <th class="py-2.5 px-3">Vector Direction</th>
-                            <th class="py-2.5 px-3">F<sub>ix</sub> = F&middot;cos(&theta;)</th>
-                            <th class="py-2.5 px-3 rounded-r-lg">F<sub>iy</sub> = F&middot;sin(&theta;)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="componentTableBody" class="divide-y divide-slate-200 math-font bg-white">
-                        <!-- Dynamic Table Rows -->
-                    </tbody>
-                    <tfoot>
-                        <tr class="bg-slate-900 text-white font-bold math-font">
-                            <td colspan="4" class="py-2.5 px-3 text-right uppercase rounded-l-lg font-sans">TOTAL RESULTANT COMPONENT (&Sigma;):</td>
-                            <td class="py-2.5 px-3 text-sky-300 text-sm" id="tableSumFx">+0.00 N</td>
-                            <td class="py-2.5 px-3 text-emerald-300 text-sm rounded-r-lg" id="tableSumFy">+0.00 N</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <!-- Step-by-Step Mathematical Calculations Box -->
-            <div class="framed-inner-card p-4 sm:p-5 bg-white space-y-4">
-                <h3 class="text-xs font-extrabold text-blue-950 uppercase tracking-wider flex items-center gap-2 border-b border-slate-200 pb-2">
-                    <i class="fa-solid fa-list-check text-blue-700"></i>
-                    Complete Step-by-Step Calculation:
-                </h3>
-
-                <div class="space-y-3 math-font text-xs sm:text-sm text-slate-800">
-                    
-                    <!-- Step 1 -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-blue-950 font-sans text-xs">1. X-Axis Component Sum (&Sigma;F<sub>x</sub>):</div>
-                        <div id="step1Formula" class="text-slate-700 overflow-x-auto py-1">
-                            &Sigma;F<sub>x</sub> = 0.00 N
-                        </div>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-blue-950 font-sans text-xs">2. Y-Axis Component Sum (&Sigma;F<sub>y</sub>):</div>
-                        <div id="step2Formula" class="text-slate-700 overflow-x-auto py-1">
-                            &Sigma;F<sub>y</sub> = 0.00 N
-                        </div>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-blue-950 font-sans text-xs">3. Resultant Force Magnitude (F<sub>R</sub>):</div>
-                        <div id="step3Formula" class="text-slate-700 overflow-x-auto py-1">
-                            F<sub>R</sub> = &radic;[(&Sigma;F<sub>x</sub>)<sup>2</sup> + (&Sigma;F<sub>y</sub>)<sup>2</sup>]
-                        </div>
-                    </div>
-
-                    <!-- Step 4 -->
-                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-blue-950 font-sans text-xs">4. Direction Angle (&theta;<sub>R</sub>):</div>
-                        <div id="step4Formula" class="text-slate-700 overflow-x-auto py-1 leading-relaxed">
-                            Reference Angle = tan<sup>-1</sup>|&Sigma;F<sub>y</sub> / &Sigma;F<sub>x</sub>|
-                        </div>
-                    </div>
-
+            <!-- Component Breakdown Table -->
+            <div class="pt-2">
+                <div class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-table-list text-indigo-600"></i> Individual Force Vector Component Breakdown Table:
+                </div>
+                <div class="overflow-x-auto rounded-xl border border-indigo-900/20 shadow-sm">
+                    <table class="w-full text-xs text-left font-mono-code">
+                        <thead class="bg-[#0b1736] text-white uppercase text-[11px] font-bold">
+                            <tr>
+                                <th class="px-4 py-2.5">Force Vector</th>
+                                <th class="px-4 py-2.5">Magnitude (F)</th>
+                                <th class="px-4 py-2.5">Angle (&theta;)</th>
+                                <th class="px-4 py-2.5">Vector Direction</th>
+                                <th class="px-4 py-2.5 text-blue-300">F<sub>ix</sub> = F&middot;cos(&theta;)</th>
+                                <th class="px-4 py-2.5 text-emerald-300">F<sub>iy</sub> = F&middot;sin(&theta;)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="breakdown-table-body" class="divide-y divide-slate-200 bg-white font-bold">
+                            <!-- Dynamic Table Rows injected via JS -->
+                        </tbody>
+                        <tfoot class="bg-[#0b1736] text-white font-extrabold border-t-2 border-indigo-700">
+                            <tr>
+                                <td colspan="4" class="px-4 py-2.5 text-right uppercase tracking-wider text-[11px]">Total Resultant Component (&Sigma;):</td>
+                                <td id="table-total-fx" class="px-4 py-2.5 text-blue-400">+15.57 N</td>
+                                <td id="table-total-fy" class="px-4 py-2.5 text-emerald-400">+124.85 N</td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 
+            <!-- Complete Step-by-Step Calculation Cards -->
+            <div class="pt-3 border-t border-slate-100 space-y-3">
+                <div class="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-indigo-600"></i> COMPLETE STEP-BY-STEP CALCULATION:
+                </div>
+
+                <div id="step-by-step-cards-container" class="space-y-2.5 font-mono-code text-xs">
+                    <!-- Dynamic Step-By-Step Cards Injected via JS -->
+                </div>
+            </div>
         </div>
 
     </main>
 
-    <!-- Page Footer -->
-    <footer class="max-w-7xl mx-auto px-4 mt-8 text-center text-xs text-slate-500 font-semibold">
-        Interactive Resultant Force Simulator &bull; Physics & Engineering Science Unit
+    <!-- Custom Notification Toast Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- Footer -->
+    <footer class="bg-[#0b1736] text-slate-400 py-3 text-center text-xs mt-auto border-t border-indigo-900/40">
+        <p>Interactive Resultant Force Simulator &bull; Science Unit JMSK, PPD</p>
     </footer>
 
     <script>
-        // Default Preset Palette for Forces
-        const COLOR_PALETTE = [
-            '#2563eb', // Blue
-            '#dc2626', // Red
-            '#059669', // Emerald
-            '#d97706', // Amber
-            '#7c3aed', // Purple
-            '#0891b2'  // Cyan
+        const VECTOR_COLORS = [
+            '#2563eb', // Blue (F1)
+            '#dc2626', // Red (F2)
+            '#059669', // Emerald (F3)
+            '#7c3aed', // Purple (F4)
+            '#d97706', // Amber (F5)
+            '#0284c7', // Cyan (F6)
+            '#e11d48', // Rose (F7)
+            '#4f46e5'  // Indigo (F8)
         ];
 
-        let fMax = 200;
-        let visualMode = 'concurrent'; // 'concurrent' or 'polygon'
-        let draggedForceId = null;
+        let config = {
+            fMax: 200
+        };
 
-        // Default Initial Forces List
+        // Default initial forces: F1 = 120N @ 45°, F2 = 80N @ 150°
         let forces = [
-            { id: 1, name: 'F1', magnitude: 120, angle: 45, direction: 'outward', color: COLOR_PALETTE[0] },
-            { id: 2, name: 'F2', magnitude: 80,  angle: 150, direction: 'outward', color: COLOR_PALETTE[1] }
+            { id: 1, F: 120, theta: 45, dir: 'out' },
+            { id: 2, F: 80, theta: 150, dir: 'out' }
         ];
 
         let nextForceId = 3;
+        let activeDragIndex = -1;
 
-        // DOM Elements
         const canvas = document.getElementById('vectorCanvas');
         const ctx = canvas.getContext('2d');
-        const forcesContainer = document.getElementById('forcesContainer');
-        const fmaxInput = document.getElementById('fmaxInput');
-        const resetBtn = document.getElementById('resetBtn');
-        const addForceBtn = document.getElementById('addForceBtn');
-        const modeConcurrentBtn = document.getElementById('modeConcurrentBtn');
-        const modePolygonBtn = document.getElementById('modePolygonBtn');
-        const canvasModeLabel = document.getElementById('canvasModeLabel');
-        const forceCountBadge = document.getElementById('forceCountBadge');
-
-        // Output Stat Elements
-        const statFx = document.getElementById('statFx');
-        const statFxDir = document.getElementById('statFxDir');
-        const statFy = document.getElementById('statFy');
-        const statFyDir = document.getElementById('statFyDir');
-        const statFr = document.getElementById('statFr');
-        const statTheta = document.getElementById('statTheta');
-        const statQuad = document.getElementById('statQuad');
-
-        // Table & Steps Elements
-        const componentTableBody = document.getElementById('componentTableBody');
-        const tableSumFx = document.getElementById('tableSumFx');
-        const tableSumFy = document.getElementById('tableSumFy');
-        const step1Formula = document.getElementById('step1Formula');
-        const step2Formula = document.getElementById('step2Formula');
-        const step3Formula = document.getElementById('step3Formula');
-        const step4Formula = document.getElementById('step4Formula');
-
-        function resizeCanvas() {
-            const rect = canvas.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = rect.width * dpr;
-            canvas.height = rect.height * dpr;
-            ctx.scale(dpr, dpr);
-            render();
-        }
-
-        function calculatePhysics() {
-            let sumFx = 0;
-            let sumFy = 0;
-
-            const calculatedForces = forces.map(f => {
-                const rad = (f.angle * Math.PI) / 180;
-                let rawFx = f.magnitude * Math.cos(rad);
-                let rawFy = f.magnitude * Math.sin(rad);
-
-                // If INWARD, vector points towards origin (reverse vector direction)
-                if (f.direction === 'inward') {
-                    rawFx = -rawFx;
-                    rawFy = -rawFy;
-                }
-
-                sumFx += rawFx;
-                sumFy += rawFy;
-
-                return {
-                    ...f,
-                    fx: rawFx,
-                    fy: rawFy
-                };
-            });
-
-            const fr = Math.sqrt(sumFx * sumFx + sumFy * sumFy);
-            
-            // Reference Angle tan^-1(|Fy/Fx|)
-            let refTheta = 0;
-            if (Math.abs(sumFx) > 0.0001) {
-                refTheta = (Math.atan(Math.abs(sumFy) / Math.abs(sumFx)) * 180) / Math.PI;
-            } else if (Math.abs(sumFy) > 0.0001) {
-                refTheta = 90;
-            }
-
-            // Standard Angle counter-clockwise from +X axis
-            let stdTheta = 0;
-            let quadrant = "QUADRANT I";
-
-            if (sumFx >= 0 && sumFy >= 0) {
-                stdTheta = refTheta;
-                quadrant = "QUADRANT I";
-            } else if (sumFx < 0 && sumFy >= 0) {
-                stdTheta = 180 - refTheta;
-                quadrant = "QUADRANT II";
-            } else if (sumFx < 0 && sumFy < 0) {
-                stdTheta = 180 + refTheta;
-                quadrant = "QUADRANT III";
-            } else if (sumFx >= 0 && sumFy < 0) {
-                stdTheta = 360 - refTheta;
-                quadrant = "QUADRANT IV";
-            }
-
-            return {
-                calculatedForces,
-                sumFx,
-                sumFy,
-                fr,
-                refTheta,
-                stdTheta,
-                quadrant
-            };
-        }
-
-        function drawCanvas(calc) {
-            const rect = canvas.getBoundingClientRect();
-            const width = rect.width;
-            const height = rect.height;
-            const center = { x: width / 2, y: height / 2 };
-            const scale = (Math.min(width, height) * 0.38) / fMax;
-
-            ctx.clearRect(0, 0, width, height);
-
-            // 1. Grid Circles and Crosshair Background
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 1;
-
-            const gridSteps = [0.25, 0.5, 0.75, 1.0];
-            gridSteps.forEach(ratio => {
-                const r = fMax * ratio * scale;
-                ctx.beginPath();
-                ctx.arc(center.x, center.y, r, 0, Math.PI * 2);
-                ctx.stroke();
-            });
-
-            // Quadrant Label Watermarks
-            ctx.font = '700 13px Inter';
-            ctx.fillStyle = '#cbd5e1';
-            ctx.fillText('QUADRANT II', center.x - 140, center.y - 100);
-            ctx.fillText('QUADRANT I', center.x + 60, center.y - 100);
-            ctx.fillText('QUADRANT III', center.x - 140, center.y + 120);
-            ctx.fillText('QUADRANT IV', center.x + 60, center.y + 120);
-
-            // Main Axes (+X, -X, +Y, -Y)
-            ctx.strokeStyle = '#1e3a8a';
-            ctx.lineWidth = 2.5;
-
-            // X-Axis
-            ctx.beginPath();
-            ctx.moveTo(20, center.y);
-            ctx.lineTo(width - 20, center.y);
-            ctx.stroke();
-
-            // Y-Axis
-            ctx.beginPath();
-            ctx.moveTo(center.x, 20);
-            ctx.lineTo(center.x, height - 20);
-            ctx.stroke();
-
-            // Axis Labels
-            ctx.font = '800 11px JetBrains Mono';
-            ctx.fillStyle = '#1e3a8a';
-            ctx.fillText('+X (0°)', width - 55, center.y - 8);
-            ctx.fillText('-X (180°)', 10, center.y - 8);
-            ctx.fillText('+Y (90°)', center.x + 8, 25);
-            ctx.fillText('-Y (270°)', center.x + 8, height - 15);
-
-            // 2. Draw Vectors based on Selected Mode
-            if (visualMode === 'concurrent') {
-                // All vectors originate at (0,0)
-                calc.calculatedForces.forEach(f => {
-                    const startX = center.x;
-                    const startY = center.y;
-                    const endX = center.x + f.fx * scale;
-                    const endY = center.y - f.fy * scale;
-
-                    drawArrow(startX, startY, endX, endY, f.color, 3, `${f.name} = ${f.magnitude.toFixed(0)}N`);
-                });
-            } else {
-                // Tip-to-Tail Polygon Mode
-                let currentX = center.x;
-                let currentY = center.y;
-
-                calc.calculatedForces.forEach(f => {
-                    const nextX = currentX + f.fx * scale;
-                    const nextY = currentY - f.fy * scale;
-
-                    drawArrow(currentX, currentY, nextX, nextY, f.color, 3, `${f.name}`);
-                    currentX = nextX;
-                    currentY = nextY;
-                });
-            }
-
-            // 3. Draw Resultant Force Vector (FR)
-            const frEndX = center.x + calc.sumFx * scale;
-            const frEndY = center.y - calc.sumFy * scale;
-
-            if (calc.fr > 0.1) {
-                // Dashed Component Lines for Resultant Vector
-                ctx.setLineDash([5, 4]);
-                ctx.strokeStyle = '#0284c7';
-                ctx.lineWidth = 1.5;
-
-                // Fx dashed line
-                ctx.beginPath();
-                ctx.moveTo(center.x, center.y);
-                ctx.lineTo(frEndX, center.y);
-                ctx.stroke();
-
-                // Fy dashed line
-                ctx.strokeStyle = '#059669';
-                ctx.beginPath();
-                ctx.moveTo(frEndX, center.y);
-                ctx.lineTo(frEndX, frEndY);
-                ctx.stroke();
-
-                ctx.setLineDash([]); // Reset dash
-
-                // Resultant Arrow
-                drawArrow(center.x, center.y, frEndX, frEndY, '#d97706', 4.5, `FR = ${calc.fr.toFixed(1)}N`, true);
-            }
-
-            // Draw Origin Dot
-            ctx.beginPath();
-            ctx.arc(center.x, center.y, 5, 0, Math.PI * 2);
-            ctx.fillStyle = '#1e3a8a';
-            ctx.fill();
-        }
-
-        function drawArrow(fromX, fromY, toX, toY, color, width, label, isResultant = false) {
-            const headLength = isResultant ? 14 : 10;
-            const dx = toX - fromX;
-            const dy = toY - fromY;
-            const angle = Math.atan2(dy, dx);
-
-            // Line Body
-            ctx.strokeStyle = color;
-            ctx.lineWidth = width;
-            ctx.beginPath();
-            ctx.moveTo(fromX, fromY);
-            ctx.lineTo(toX, toY);
-            ctx.stroke();
-
-            // Arrow Tip Head
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.moveTo(toX, toY);
-            ctx.lineTo(toX - headLength * Math.cos(angle - Math.PI / 6), toY - headLength * Math.sin(angle - Math.PI / 6));
-            ctx.lineTo(toX - headLength * Math.cos(angle + Math.PI / 6), toY - headLength * Math.sin(angle + Math.PI / 6));
-            ctx.closePath();
-            ctx.fill();
-
-            // Interactive Handle Circle at Tip
-            ctx.beginPath();
-            ctx.arc(toX, toY, isResultant ? 7 : 6, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-            ctx.strokeStyle = color;
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            // Label
-            if (label) {
-                ctx.font = isResultant ? '800 12px Inter' : '700 11px Inter';
-                ctx.fillStyle = color;
-                ctx.fillText(label, toX + 10, toY - 8);
-            }
-        }
-
-        function updateUIDisplays(calc) {
-            // Stat Cards
-            statFx.textContent = `${calc.sumFx >= 0 ? '+' : ''}${calc.sumFx.toFixed(2)} N`;
-            statFxDir.textContent = calc.sumFx >= 0 ? 'Direction: Right (+X)' : 'Direction: Left (-X)';
-
-            statFy.textContent = `${calc.sumFy >= 0 ? '+' : ''}${calc.sumFy.toFixed(2)} N`;
-            statFyDir.textContent = calc.sumFy >= 0 ? 'Direction: Upward (+Y)' : 'Direction: Downward (-Y)';
-
-            statFr.textContent = `${calc.fr.toFixed(2)} N`;
-            statTheta.textContent = `${calc.stdTheta.toFixed(1)}°`;
-            statQuad.textContent = calc.quadrant;
-            forceCountBadge.textContent = `${forces.length} ${forces.length === 1 ? 'Force' : 'Forces'}`;
-
-            // Component Breakdown Table Rows
-            componentTableBody.innerHTML = '';
-            calc.calculatedForces.forEach(f => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-blue-50/50 transition-colors";
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-extrabold flex items-center gap-2">
-                        <span class="w-3.5 h-3.5 rounded-full inline-block shadow-sm" style="background-color: ${f.color}"></span>
-                        ${f.name}
-                    </td>
-                    <td class="py-2.5 px-3 font-semibold">${f.magnitude.toFixed(1)} N</td>
-                    <td class="py-2.5 px-3 font-semibold">${f.angle.toFixed(1)}&deg;</td>
-                    <td class="py-2.5 px-3 font-bold uppercase text-[10px]">
-                        <span class="${f.direction === 'outward' ? 'text-blue-700 bg-blue-100' : 'text-amber-700 bg-amber-100'} px-2 py-0.5 rounded-md border border-slate-200">
-                            ${f.direction.toUpperCase()}
-                        </span>
-                    </td>
-                    <td class="py-2.5 px-3 font-bold ${f.fx >= 0 ? 'text-blue-600' : 'text-rose-600'}">
-                        ${f.fx >= 0 ? '+' : ''}${f.fx.toFixed(2)} N
-                    </td>
-                    <td class="py-2.5 px-3 font-bold ${f.fy >= 0 ? 'text-emerald-600' : 'text-rose-600'}">
-                        ${f.fy >= 0 ? '+' : ''}${f.fy.toFixed(2)} N
-                    </td>
-                `;
-                componentTableBody.appendChild(tr);
-            });
-
-            tableSumFx.textContent = `${calc.sumFx >= 0 ? '+' : ''}${calc.sumFx.toFixed(2)} N`;
-            tableSumFy.textContent = `${calc.sumFy >= 0 ? '+' : ''}${calc.sumFy.toFixed(2)} N`;
-
-            // Step-by-Step Stepwise Calculations
-            const fxExp = calc.calculatedForces.map(f => `(${f.fx >= 0 ? '+' : ''}${f.fx.toFixed(2)})`).join(' + ');
-            step1Formula.innerHTML = `&Sigma;F<sub>x</sub> = ${fxExp} = <span class="font-black text-blue-600">${calc.sumFx >= 0 ? '+' : ''}${calc.sumFx.toFixed(2)} N</span> (${calc.sumFx >= 0 ? 'To the Right' : 'To the Left'})`;
-
-            const fyExp = calc.calculatedForces.map(f => `(${f.fy >= 0 ? '+' : ''}${f.fy.toFixed(2)})`).join(' + ');
-            step2Formula.innerHTML = `&Sigma;F<sub>y</sub> = ${fyExp} = <span class="font-black text-emerald-600">${calc.sumFy >= 0 ? '+' : ''}${calc.sumFy.toFixed(2)} N</span> (${calc.sumFy >= 0 ? 'Upward' : 'Downward'})`;
-
-            step3Formula.innerHTML = `F<sub>R</sub> = &radic;[(&Sigma;F<sub>x</sub>)<sup>2</sup> + (&Sigma;F<sub>y</sub>)<sup>2</sup>] = &radic;[(${calc.sumFx.toFixed(2)})<sup>2</sup> + (${calc.sumFy.toFixed(2)})<sup>2</sup>] = <span class="font-black text-amber-600">${calc.fr.toFixed(2)} N</span>`;
-
-            step4Formula.innerHTML = `
-                <div>X-Axis Reference Angle = tan<sup>-1</sup>|&Sigma;F<sub>y</sub> / &Sigma;F<sub>x</sub>| = tan<sup>-1</sup>|${Math.abs(calc.sumFy).toFixed(2)} / ${Math.abs(calc.sumFx).toFixed(2)}| = <strong>${calc.refTheta.toFixed(1)}&deg;</strong> (${calc.quadrant})</div>
-                <div class="font-bold text-purple-700 font-sans text-xs pt-1">Standard Angle (Counter-Clockwise from +X) = ${calc.stdTheta.toFixed(1)}&deg;</div>
-            `;
-        }
-
-        function renderForceCards() {
-            forcesContainer.innerHTML = '';
-
-            forces.forEach((f) => {
-                const card = document.createElement('div');
-                card.className = "p-3 bg-white border-2 border-slate-200 rounded-2xl shadow-sm hover:border-blue-400 transition-all space-y-2.5";
-                card.innerHTML = `
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-3.5 h-3.5 rounded-full shadow-sm" style="background-color: ${f.color}"></span>
-                            <span class="font-extrabold text-blue-950 text-sm">${f.name}</span>
-                        </div>
-                        <div class="flex items-center space-x-1.5">
-                            <button onclick="toggleDirection(${f.id})" class="text-[10px] font-extrabold px-2 py-1 rounded-lg border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 flex items-center gap-1" title="Toggle Direction IN/OUT">
-                                <i class="fa-solid fa-arrows-retarget text-slate-500"></i> ${f.direction.toUpperCase()}
-                            </button>
-                            ${forces.length > 1 ? `
-                                <button onclick="removeForce(${f.id})" class="text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition-colors" title="Delete Force">
-                                    <i class="fa-solid fa-trash-can text-xs"></i>
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Magnitude F (N):</label>
-                            <input type="number" min="0" max="${fMax}" value="${Math.round(f.magnitude)}" 
-                                onchange="updateForceProp(${f.id}, 'magnitude', this.value)"
-                                class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600">
-                        </div>
-
-                        <div>
-                            <label class="block text-[11px] font-bold text-slate-600 mb-1">Angle &theta; (&deg;):</label>
-                            <input type="number" min="0" max="360" value="${Math.round(f.angle)}" 
-                                onchange="updateForceProp(${f.id}, 'angle', this.value)"
-                                class="w-full bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600">
-                        </div>
-                    </div>
-
-                    <div>
-                        <input type="range" min="0" max="${fMax}" value="${f.magnitude}" 
-                            oninput="updateForceProp(${f.id}, 'magnitude', this.value)"
-                            class="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                    </div>
-                `;
-                forcesContainer.appendChild(card);
-            });
-        }
-
-        function render() {
-            const calc = calculatePhysics();
-            drawCanvas(calc);
-            updateUIDisplays(calc);
-        }
-
-        function updateForceProp(id, prop, value) {
-            const force = forces.find(f => f.id === id);
-            if (!force) return;
-
-            let numVal = parseFloat(value);
-            if (isNaN(numVal)) numVal = 0;
-
-            if (prop === 'magnitude') {
-                force.magnitude = Math.max(0, Math.min(fMax, numVal));
-            } else if (prop === 'angle') {
-                force.angle = (numVal % 360 + 360) % 360;
-            }
-
-            renderForceCards();
-            render();
-        }
-
-        function toggleDirection(id) {
-            const force = forces.find(f => f.id === id);
-            if (!force) return;
-            force.direction = force.direction === 'outward' ? 'inward' : 'outward';
-            renderForceCards();
-            render();
-        }
-
-        function removeForce(id) {
-            if (forces.length <= 1) return;
-            forces = forces.filter(f => f.id !== id);
-            renderForceCards();
-            render();
-        }
-
-        function addForce() {
-            const newColor = COLOR_PALETTE[forces.length % COLOR_PALETTE.length];
-            forces.push({
-                id: nextForceId,
-                name: `F${nextForceId}`,
-                magnitude: 100,
-                angle: 60,
-                direction: 'outward',
-                color: newColor
-            });
-            nextForceId++;
-            renderForceCards();
-            render();
-        }
-
-        function handlePointerDown(e) {
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            const width = rect.width;
-            const height = rect.height;
-            const center = { x: width / 2, y: height / 2 };
-            const scale = (Math.min(width, height) * 0.38) / fMax;
-
-            // Check if user clicked near any force tip
-            const calc = calculatePhysics();
-            let closestDist = 20; // Hit radius
-            draggedForceId = null;
-
-            calc.calculatedForces.forEach(f => {
-                const tipX = center.x + f.fx * scale;
-                const tipY = center.y - f.fy * scale;
-                const dist = Math.hypot(x - tipX, y - tipY);
-
-                if (dist < closestDist) {
-                    closestDist = dist;
-                    draggedForceId = f.id;
-                }
-            });
-        }
-
-        function handlePointerMove(e) {
-            if (draggedForceId === null) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-            const x = clientX - rect.left;
-            const y = clientY - rect.top;
-
-            const width = rect.width;
-            const height = rect.height;
-            const center = { x: width / 2, y: height / 2 };
-            const scale = (Math.min(width, height) * 0.38) / fMax;
-
-            const dx = x - center.x;
-            const dy = center.y - y;
-
-            const force = forces.find(f => f.id === draggedForceId);
-            if (!force) return;
-
-            // Calculate new magnitude and angle from drag position
-            let rawMag = Math.hypot(dx, dy) / scale;
-            force.magnitude = Math.max(0, Math.min(fMax, rawMag));
-
-            let rad = Math.atan2(dy, dx);
-            let deg = (rad * 180) / Math.PI;
-            if (deg < 0) deg += 360;
-
-            force.angle = Math.round(deg);
-
-            renderForceCards();
-            render();
-        }
-
-        function handlePointerUp() {
-            draggedForceId = null;
-        }
 
         window.onload = function() {
             resizeCanvas();
             window.addEventListener('resize', resizeCanvas);
-
-            // Canvas Pointer Events
-            canvas.addEventListener('mousedown', handlePointerDown);
-            canvas.addEventListener('mousemove', handlePointerMove);
-            window.addEventListener('mouseup', handlePointerUp);
-
-            canvas.addEventListener('touchstart', handlePointerDown, { passive: true });
-            canvas.addEventListener('touchmove', handlePointerMove, { passive: true });
-            window.addEventListener('touchend', handlePointerUp);
-
-            // Controls Events
-            addForceBtn.addEventListener('click', addForce);
-
-            resetBtn.addEventListener('click', () => {
-                forces = [
-                    { id: 1, name: 'F1', magnitude: 120, angle: 45, direction: 'outward', color: COLOR_PALETTE[0] },
-                    { id: 2, name: 'F2', magnitude: 80,  angle: 150, direction: 'outward', color: COLOR_PALETTE[1] }
-                ];
-                nextForceId = 3;
-                fMax = 200;
-                fmaxInput.value = 200;
-                renderForceCards();
-                render();
-            });
-
-            fmaxInput.addEventListener('change', (e) => {
-                let val = parseFloat(e.target.value);
-                if (isNaN(val) || val < 50) val = 50;
-                fMax = val;
-                renderForceCards();
-                render();
-            });
-
-            // Visual Mode Switcher
-            modeConcurrentBtn.addEventListener('click', () => {
-                visualMode = 'concurrent';
-                modeConcurrentBtn.className = "px-2.5 py-1 rounded-lg bg-blue-950 text-white shadow-sm transition-all";
-                modePolygonBtn.className = "px-2.5 py-1 rounded-lg text-slate-600 hover:text-blue-950 transition-all";
-                canvasModeLabel.textContent = "Mode: Concurrent";
-                render();
-            });
-
-            modePolygonBtn.addEventListener('click', () => {
-                visualMode = 'polygon';
-                modePolygonBtn.className = "px-2.5 py-1 rounded-lg bg-blue-950 text-white shadow-sm transition-all";
-                modeConcurrentBtn.className = "px-2.5 py-1 rounded-lg text-slate-600 hover:text-blue-950 transition-all";
-                canvasModeLabel.textContent = "Mode: Tip-to-Tail Polygon";
-                render();
-            });
-
-            // Initial Render
-            renderForceCards();
-            render();
+            setupCanvasInteraction();
+            renderForceInputCards();
+            updateAll();
         };
+
+        function showNotification(msg, type = 'info') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl shadow-lg border text-xs font-bold transition-all transform duration-300 pointer-events-auto flex items-center gap-2 ${
+                type === 'error' ? 'bg-rose-900 text-white border-rose-700' : 'bg-indigo-900 text-white border-indigo-700'
+            }`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info'}"></i> ${msg}`;
+            
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+            drawCanvas();
+        }
+
+        function updateFmax(val) {
+            let parsed = parseFloat(val);
+            if (isNaN(parsed) || parsed < 10) parsed = 200;
+            config.fMax = parsed;
+
+            forces.forEach(f => {
+                if (f.F > config.fMax) f.F = config.fMax;
+            });
+
+            renderForceInputCards();
+            updateAll();
+        }
+
+        function resetSimulator() {
+            config.fMax = 200;
+            document.getElementById('input-fmax').value = 200;
+
+            forces = [
+                { id: 1, F: 120, theta: 45, dir: 'out' },
+                { id: 2, F: 80, theta: 150, dir: 'out' }
+            ];
+            nextForceId = 3;
+
+            renderForceInputCards();
+            updateAll();
+            showNotification("Simulator reset to default state.");
+        }
+
+        function addForce() {
+            if (forces.length >= 8) {
+                showNotification("Maximum of 8 forces allowed.", "error");
+                return;
+            }
+            forces.push({
+                id: nextForceId++,
+                F: 50,
+                theta: Math.round(Math.random() * 360),
+                dir: 'out'
+            });
+
+            renderForceInputCards();
+            updateAll();
+        }
+
+        function removeForce(id) {
+            if (forces.length <= 1) {
+                showNotification("At least one force is required.", "error");
+                return;
+            }
+            forces = forces.filter(f => f.id !== id);
+            renderForceInputCards();
+            updateAll();
+        }
+
+        function updateForceParam(id, key, value) {
+            const force = forces.find(f => f.id === id);
+            if (force) {
+                if (key === 'dir') {
+                    force.dir = value; // 'out' or 'in'
+                } else {
+                    let parsedVal = parseFloat(value);
+                    if (isNaN(parsedVal)) parsedVal = 0;
+
+                    if (key === 'F') {
+                        parsedVal = Math.max(0, Math.min(config.fMax, parsedVal));
+                    } else if (key === 'theta') {
+                        parsedVal = ((parsedVal % 360) + 360) % 360;
+                    }
+
+                    force[key] = parsedVal;
+
+                    const sliderEl = document.getElementById(`slider-${key}-${id}`);
+                    const inputEl = document.getElementById(`input-${key}-${id}`);
+                    if (sliderEl) sliderEl.value = parsedVal;
+                    if (inputEl && document.activeElement !== inputEl) inputEl.value = parsedVal;
+                }
+
+                updateAll();
+            }
+        }
+
+        function renderForceInputCards() {
+            const container = document.getElementById('forces-input-container');
+            if (!container) return;
+
+            let html = '';
+
+            forces.forEach((f, idx) => {
+                const color = VECTOR_COLORS[idx % VECTOR_COLORS.length];
+                const isOut = f.dir === 'out';
+
+                html += `
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2 relative" style="border-left: 4px solid ${color}">
+                        <div class="flex items-center justify-between font-bold text-xs border-b border-slate-200/60 pb-1.5">
+                            <span class="text-indigo-950 flex items-center gap-1.5">
+                                <span class="w-3 h-3 rounded-full inline-block" style="background-color: ${color}"></span>
+                                Force F<sub>${idx + 1}</sub>
+                            </span>
+
+                            <div class="flex items-center gap-2">
+                                <select onchange="updateForceParam(${f.id}, 'dir', this.value)" 
+                                        class="bg-white border font-bold text-[11px] rounded px-1.5 py-0.5 text-slate-700 border-slate-300 focus:outline-none cursor-pointer">
+                                    <option value="out" ${isOut ? 'selected' : ''}>Outward (OUT)</option>
+                                    <option value="in" ${!isOut ? 'selected' : ''}>Inward (IN)</option>
+                                </select>
+                                <button onclick="removeForce(${f.id})" class="text-rose-500 hover:text-rose-700 text-xs px-1" title="Delete Force">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <!-- Force Magnitude (F) -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Force (F):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-F-${f.id}" min="0" max="${config.fMax}" step="1" value="${f.F}"
+                                               class="w-12 bg-white border border-indigo-300 font-bold text-indigo-900 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'F', this.value)">
+                                        <span class="font-bold text-indigo-900">N</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-F-${f.id}" min="0" max="${config.fMax}" value="${f.F}" step="1"
+                                       class="w-full cursor-pointer accent-indigo-600"
+                                       oninput="updateForceParam(${f.id}, 'F', this.value)">
+                            </div>
+
+                            <!-- Angle (theta) -->
+                            <div>
+                                <div class="flex justify-between items-center mb-1 text-[10px]">
+                                    <span class="text-slate-600 font-bold">Angle (&theta;):</span>
+                                    <div class="flex items-center gap-0.5">
+                                        <input type="number" id="input-theta-${f.id}" min="0" max="360" step="1" value="${f.theta}"
+                                               class="w-12 bg-white border border-amber-300 font-bold text-amber-700 font-mono-code text-[11px] rounded px-1 py-0.5 text-right focus:outline-none"
+                                               oninput="updateForceParam(${f.id}, 'theta', this.value)">
+                                        <span class="font-bold text-amber-700">&deg;</span>
+                                    </div>
+                                </div>
+                                <input type="range" id="slider-theta-${f.id}" min="0" max="360" value="${f.theta}" step="1"
+                                       class="w-full accent-amber-500 cursor-pointer"
+                                       oninput="updateForceParam(${f.id}, 'theta', this.value)">
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+
+            const badgeCount = document.getElementById('badge-force-count');
+            if (badgeCount) badgeCount.innerText = `${forces.length} Force${forces.length > 1 ? 's' : ''}`;
+        }
+
+        function getQuadrant(deg) {
+            deg = ((deg % 360) + 360) % 360;
+            if (deg >= 0 && deg < 90) return "QUADRANT I";
+            if (deg >= 90 && deg < 180) return "QUADRANT II";
+            if (deg >= 180 && deg < 270) return "QUADRANT III";
+            return "QUADRANT IV";
+        }
+
+        function updateAll() {
+            let totalFx = 0;
+            let totalFy = 0;
+
+            let tableHtml = '';
+            let fixList = [];
+            let fiyList = [];
+
+            forces.forEach((f, idx) => {
+                const color = VECTOR_COLORS[idx % VECTOR_COLORS.length];
+                let rad = (f.theta * Math.PI) / 180;
+                let dirMult = f.dir === 'in' ? -1 : 1;
+
+                let Fix = f.F * Math.cos(rad) * dirMult;
+                let Fiy = f.F * Math.sin(rad) * dirMult;
+
+                totalFx += Fix;
+                totalFy += Fiy;
+
+                fixList.push(Fix);
+                fiyList.push(Fiy);
+
+                tableHtml += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="px-4 py-2 font-bold flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full inline-block" style="background-color: ${color}"></span>
+                            F${idx + 1}
+                        </td>
+                        <td class="px-4 py-2">${f.F.toFixed(1)} N</td>
+                        <td class="px-4 py-2">${f.theta.toFixed(1)}&deg;</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${f.dir === 'out' ? 'bg-blue-100 text-blue-800' : 'bg-rose-100 text-rose-800'}">
+                                ${f.dir === 'out' ? 'OUTWARD' : 'INWARD'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2 text-blue-600">${Fix >= 0 ? '+' : ''}${Fix.toFixed(2)} N</td>
+                        <td class="px-4 py-2 text-emerald-600">${Fiy >= 0 ? '+' : ''}${Fiy.toFixed(2)} N</td>
+                    </tr>
+                `;
+            });
+
+            let FR = Math.sqrt(totalFx * totalFx + totalFy * totalFy);
+            let thetaRRad = Math.atan2(totalFy, totalFx);
+            let thetaRDeg = ((thetaRRad * 180 / Math.PI) + 360) % 360;
+
+            let quadrantStr = getQuadrant(thetaRDeg);
+
+            // Update Summary Metric Cards
+            document.getElementById('metric-fx-val').innerText = `${totalFx >= 0 ? '+' : ''}${totalFx.toFixed(2)} N`;
+            document.getElementById('metric-fx-dir').innerText = `Direction: ${totalFx >= 0 ? 'Right (+X)' : 'Left (-X)'}`;
+
+            document.getElementById('metric-fy-val').innerText = `${totalFy >= 0 ? '+' : ''}${totalFy.toFixed(2)} N`;
+            document.getElementById('metric-fy-dir').innerText = `Direction: ${totalFy >= 0 ? 'Upward (+Y)' : 'Downward (-Y)'}`;
+
+            document.getElementById('metric-fr-val').innerText = `${FR.toFixed(2)} N`;
+            document.getElementById('metric-theta-val').innerText = `${thetaRDeg.toFixed(1)}°`;
+            document.getElementById('metric-quadrant-tag').innerText = quadrantStr;
+
+            // Update Component Breakdown Table
+            document.getElementById('breakdown-table-body').innerHTML = tableHtml;
+            document.getElementById('table-total-fx').innerText = `${totalFx >= 0 ? '+' : ''}${totalFx.toFixed(2)} N`;
+            document.getElementById('table-total-fy').innerText = `${totalFy >= 0 ? '+' : ''}${totalFy.toFixed(2)} N`;
+
+            // Update Step-by-Step Calculation Cards
+            renderStepByStepCards(totalFx, totalFy, fixList, fiyList, FR, thetaRDeg, quadrantStr);
+
+            drawCanvas();
+        }
+
+        function renderStepByStepCards(totalFx, totalFy, fixList, fiyList, FR, thetaRDeg, quadrantStr) {
+            const container = document.getElementById('step-by-step-cards-container');
+            if (!container) return;
+
+            let fxTermsStr = fixList.map(v => `(${v >= 0 ? '+' : ''}${v.toFixed(2)})`).join(' + ');
+            let fyTermsStr = fiyList.map(v => `(${v >= 0 ? '+' : ''}${v.toFixed(2)})`).join(' + ');
+
+            let dirFxStr = totalFx >= 0 ? "To the Right" : "To the Left";
+            let dirFyStr = totalFy >= 0 ? "Upward" : "Downward";
+
+            let refAngleDeg = Math.abs(thetaRDeg % 90);
+            if ((thetaRDeg >= 90 && thetaRDeg < 180) || (thetaRDeg >= 270 && thetaRDeg < 360)) {
+                refAngleDeg = 90 - refAngleDeg;
+            }
+
+            let html = `
+                <!-- Step 1: X-Axis Component Sum -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-blue-900">1. X-Axis Component Sum (&Sigma;F<sub>x</sub>):</div>
+                    <div class="text-slate-800">
+                        &Sigma;F<sub>x</sub> = ${fxTermsStr} = <strong class="text-blue-700">${totalFx >= 0 ? '+' : ''}${totalFx.toFixed(2)} N</strong> (${dirFxStr})
+                    </div>
+                </div>
+
+                <!-- Step 2: Y-Axis Component Sum -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-emerald-900">2. Y-Axis Component Sum (&Sigma;F<sub>y</sub>):</div>
+                    <div class="text-slate-800">
+                        &Sigma;F<sub>y</sub> = ${fyTermsStr} = <strong class="text-emerald-700">${totalFy >= 0 ? '+' : ''}${totalFy.toFixed(2)} N</strong> (${dirFyStr})
+                    </div>
+                </div>
+
+                <!-- Step 3: Resultant Force Magnitude -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-amber-900">3. Resultant Force Magnitude (F<sub>R</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>R</sub> = &radic;[(&Sigma;F<sub>x</sub>)&sup2; + (&Sigma;F<sub>y</sub>)&sup2;] 
+                        = &radic;[(${totalFx.toFixed(2)})&sup2; + (${totalFy.toFixed(2)})&sup2;] 
+                        = <strong class="text-amber-700">${FR.toFixed(2)} N</strong>
+                    </div>
+                </div>
+
+                <!-- Step 4: Direction Angle -->
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-purple-900">4. Direction Angle (&theta;<sub>R</sub>):</div>
+                    <div class="text-slate-800">
+                        X-Axis Reference Angle = tan<sup>-1</sup>|&Sigma;F<sub>y</sub> / &Sigma;F<sub>x</sub>| 
+                        = tan<sup>-1</sup>|${Math.abs(totalFy).toFixed(2)} / ${Math.abs(totalFx).toFixed(2)}| 
+                        = <strong class="text-purple-700">${refAngleDeg.toFixed(1)}°</strong> (${quadrantStr})
+                    </div>
+                    <div class="text-[11px] text-purple-700 font-bold mt-0.5">
+                        Standard Angle (Counter-Clockwise from +X) = ${thetaRDeg.toFixed(1)}°
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const originX = canvas.width / 2;
+            const originY = canvas.height / 2;
+            const maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
+
+            // 1. Draw Concentric Polar Grid Circles
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (let r = 0.25; r <= 1.0; r += 0.25) {
+                ctx.beginPath();
+                ctx.arc(originX, originY, maxRadius * r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // 2. Draw Main Cartesian Axes (+X, -X, +Y, -Y)
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.8;
+
+            ctx.beginPath();
+            ctx.moveTo(30, originY);
+            ctx.lineTo(canvas.width - 30, originY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(originX, 30);
+            ctx.lineTo(originX, canvas.height - 30);
+            ctx.stroke();
+
+            // Axis Labels
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 11px "Plus Jakarta Sans"';
+            ctx.textAlign = 'left';
+            ctx.fillText('+X (0°)', canvas.width - 65, originY - 8);
+            ctx.textAlign = 'right';
+            ctx.fillText('-X (180°)', 70, originY - 8);
+            ctx.textAlign = 'center';
+            ctx.fillText('+Y (90°)', originX + 28, 25);
+            ctx.fillText('-Y (270°)', originX + 30, canvas.height - 15);
+
+            // Quadrant Labels
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.30)';
+            ctx.font = 'extrabold 15px "Plus Jakarta Sans"';
+            ctx.textAlign = 'center';
+            ctx.fillText('QUADRANT I', originX + maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT II', originX - maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT III', originX - maxRadius * 0.6, originY + maxRadius * 0.6);
+            ctx.fillText('QUADRANT IV', originX + maxRadius * 0.6, originY + maxRadius * 0.6);
+
+            let scale = maxRadius / config.fMax;
+
+            let totalFx = 0;
+            let totalFy = 0;
+
+            // 3. Draw Individual Force Vectors
+            forces.forEach((f, idx) => {
+                const color = VECTOR_COLORS[idx % VECTOR_COLORS.length];
+                let rad = (f.theta * Math.PI) / 180;
+                let dirMult = f.dir === 'in' ? -1 : 1;
+
+                let Fix = f.F * Math.cos(rad) * dirMult;
+                let Fiy = f.F * Math.sin(rad) * dirMult;
+
+                totalFx += Fix;
+                totalFy += Fiy;
+
+                let vecLenPx = f.F * scale;
+
+                // Handle position always stays in quadrant specified by angle theta
+                let handleX = originX + vecLenPx * Math.cos(rad);
+                let handleY = originY - vecLenPx * Math.sin(rad);
+
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+                ctx.lineWidth = 2.5;
+
+                ctx.beginPath();
+                ctx.moveTo(originX, originY);
+                ctx.lineTo(handleX, handleY);
+                ctx.stroke();
+
+                // Arrowhead direction depends on OUTWARD or INWARD
+                let arrowAngle = f.dir === 'out' 
+                    ? Math.atan2(handleY - originY, handleX - originX) 
+                    : Math.atan2(originY - handleY, originX - handleX);
+
+                let headLen = 10;
+                let arrowTipX = f.dir === 'out' ? handleX : originX + 12 * Math.cos(rad);
+                let arrowTipY = f.dir === 'out' ? handleY : originY - 12 * Math.sin(rad);
+
+                ctx.beginPath();
+                ctx.moveTo(arrowTipX, arrowTipY);
+                ctx.lineTo(arrowTipX - headLen * Math.cos(arrowAngle - Math.PI / 6), arrowTipY - headLen * Math.sin(arrowAngle - Math.PI / 6));
+                ctx.lineTo(arrowTipX - headLen * Math.cos(arrowAngle + Math.PI / 6), arrowTipY - headLen * Math.sin(arrowAngle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                // Interactive Draggable Handle Circle
+                ctx.fillStyle = color;
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(handleX, handleY, 6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Vector Label
+                ctx.font = 'bold 11px "Plus Jakarta Sans"';
+                ctx.fillStyle = color;
+                ctx.textAlign = 'center';
+                let labelAngle = Math.atan2(handleY - originY, handleX - originX);
+                let labelX = handleX + 18 * Math.cos(labelAngle);
+                let labelY = handleY + 18 * Math.sin(labelAngle);
+                ctx.fillText(`F${idx + 1} = ${f.F}N`, labelX, labelY);
+            });
+
+            // 4. Draw Resultant Force Vector (FR)
+            let FR = Math.sqrt(totalFx * totalFx + totalFy * totalFy);
+            if (FR > 0.1) {
+                let resVecLenPx = Math.min(FR * scale, maxRadius * 1.1);
+                let resRad = Math.atan2(totalFy, totalFx);
+
+                let resTipX = originX + resVecLenPx * Math.cos(resRad);
+                let resTipY = originY - resVecLenPx * Math.sin(resRad);
+
+                ctx.strokeStyle = '#d97706';
+                ctx.fillStyle = '#d97706';
+                ctx.lineWidth = 3.5;
+
+                ctx.beginPath();
+                ctx.moveTo(originX, originY);
+                ctx.lineTo(resTipX, resTipY);
+                ctx.stroke();
+
+                let resArrowAngle = Math.atan2(resTipY - originY, resTipX - originX);
+                let resHeadLen = 12;
+                ctx.beginPath();
+                ctx.moveTo(resTipX, resTipY);
+                ctx.lineTo(resTipX - resHeadLen * Math.cos(resArrowAngle - Math.PI / 6), resTipY - resHeadLen * Math.sin(resArrowAngle - Math.PI / 6));
+                ctx.lineTo(resTipX - resHeadLen * Math.cos(resArrowAngle + Math.PI / 6), resTipY - resHeadLen * Math.sin(resArrowAngle + Math.PI / 6));
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.font = 'extrabold 12px "Plus Jakarta Sans"';
+                ctx.fillStyle = '#b45309';
+                ctx.textAlign = 'center';
+                ctx.fillText(`FR = ${FR.toFixed(1)}N`, resTipX, resTipY - 10);
+            }
+        }
+
+        function setupCanvasInteraction() {
+            function handlePointerMove(e) {
+                if (activeDragIndex === -1) return;
+
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const originX = canvas.width / 2;
+                const originY = canvas.height / 2;
+
+                const dx = mouseX - originX;
+                const dy = originY - mouseY; // Invert Y
+
+                let angleRad = Math.atan2(dy, dx);
+                let angleDeg = Math.round((angleRad * 180) / Math.PI);
+                if (angleDeg < 0) angleDeg += 360;
+
+                const distPx = Math.sqrt(dx * dx + dy * dy);
+                const maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
+                let calculatedF = Math.round((distPx / maxRadius) * config.fMax);
+                calculatedF = Math.max(0, Math.min(config.fMax, calculatedF));
+
+                const f = forces[activeDragIndex];
+                if (f) {
+                    f.F = calculatedF;
+                    f.theta = angleDeg;
+
+                    const inputF = document.getElementById(`input-F-${f.id}`);
+                    const sliderF = document.getElementById(`slider-F-${f.id}`);
+                    const inputTheta = document.getElementById(`input-theta-${f.id}`);
+                    const sliderTheta = document.getElementById(`slider-theta-${f.id}`);
+
+                    if (inputF) inputF.value = calculatedF;
+                    if (sliderF) sliderF.value = calculatedF;
+                    if (inputTheta) inputTheta.value = angleDeg;
+                    if (sliderTheta) sliderTheta.value = angleDeg;
+
+                    updateAll();
+                }
+            }
+
+            canvas.addEventListener('mousedown', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const originX = canvas.width / 2;
+                const originY = canvas.height / 2;
+                let scale = (Math.min(canvas.width, canvas.height) * 0.38) / config.fMax;
+
+                activeDragIndex = -1;
+                let minDistance = 25;
+
+                forces.forEach((f, idx) => {
+                    let rad = (f.theta * Math.PI) / 180;
+                    let vecLenPx = f.F * scale;
+                    let handleX = originX + vecLenPx * Math.cos(rad);
+                    let handleY = originY - vecLenPx * Math.sin(rad);
+
+                    let dist = Math.sqrt((mouseX - handleX) ** 2 + (mouseY - handleY) ** 2);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        activeDragIndex = idx;
+                    }
+                });
+            });
+
+            window.addEventListener('mousemove', handlePointerMove);
+            window.addEventListener('mouseup', () => { activeDragIndex = -1; });
+
+            // Touch support
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 0) {
+                    const touch = e.touches[0];
+                    const rect = canvas.getBoundingClientRect();
+                    const mouseX = touch.clientX - rect.left;
+                    const mouseY = touch.clientY - rect.top;
+
+                    const originX = canvas.width / 2;
+                    const originY = canvas.height / 2;
+                    let scale = (Math.min(canvas.width, canvas.height) * 0.38) / config.fMax;
+
+                    activeDragIndex = -1;
+                    let minDistance = 30;
+
+                    forces.forEach((f, idx) => {
+                        let rad = (f.theta * Math.PI) / 180;
+                        let vecLenPx = f.F * scale;
+                        let handleX = originX + vecLenPx * Math.cos(rad);
+                        let handleY = originY - vecLenPx * Math.sin(rad);
+
+                        let dist = Math.sqrt((mouseX - handleX) ** 2 + (mouseY - handleY) ** 2);
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            activeDragIndex = idx;
+                        }
+                    });
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (activeDragIndex !== -1 && e.touches.length > 0) {
+                    handlePointerMove(e.touches[0]);
+                }
+            }, { passive: true });
+
+            window.addEventListener('touchend', () => { activeDragIndex = -1; });
+        }
     </script>
 </body>
 </html>
