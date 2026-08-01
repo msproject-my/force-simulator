@@ -56,21 +56,21 @@
             </div>
             
             <!-- Navigation Links -->
-            <!-- ==================================================================== -->
-            <!-- UPDATE MODULE LINKS HERE IF NEEDED -->
-            <!-- ==================================================================== -->
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 transition shadow-sm">
-                    <i class="fa-solid fa-house"></i> Home Hub
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <a href="index.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-2.5 py-1.5 rounded-lg text-xs flex items-center gap-1 transition shadow-sm">
+                    <i class="fa-solid fa-house"></i> Home
                 </a>
-                <a href="forces_equilibrium.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-indigo-700/50 transition">
+                <a href="forces_equilibrium.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 border border-indigo-700/50 transition">
                     <i class="fa-solid fa-scale-balanced text-amber-400"></i> Module 1
                 </a>
-                <a href="component_force.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-indigo-700/50 transition">
+                <a href="component_force.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 border border-indigo-700/50 transition">
                     <i class="fa-solid fa-chart-pie text-blue-400"></i> Module 2
                 </a>
-                <a href="resultant_force.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-3 py-1.5 rounded-lg text-xs flex items-center gap-1.5 border border-indigo-700/50 transition">
+                <a href="resultant_force.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 border border-indigo-700/50 transition">
                     <i class="fa-solid fa-diagram-project text-purple-400"></i> Module 3
+                </a>
+                <a href="two_supports_beam.html" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 transition shadow-sm">
+                    <i class="fa-solid fa-bridge text-amber-300"></i> Module 4
                 </a>
             </div>
         </div>
@@ -92,19 +92,16 @@
                     Select Your Interactive Force Simulator
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    This interactive simulator suite is designed to help you master force component resolution ($F_x, F_y$), 
-                    forces in equilibrium ($F_{\text{net}} = 0$), quadrant analysis, and multi-vector resultant force calculations ($F_R$) with real-time visual feedback.
+                    This interactive simulator suite is designed to help you master force component resolution (Fx, Fy), 
+                    forces in equilibrium, quadrant analysis, beam reaction forces (R<sub>A</sub>, R<sub>B</sub>), and multi-vector resultant force calculations (F<sub>R</sub>).
                 </p>
             </div>
         </div>
 
-        <!-- 3 MODULE CARDS GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+        <!-- MODULE CARDS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
             
             <!-- CARD 1: MODULE 1 - FORCES IN EQUILIBRIUM -->
-            <!-- ==================================================================== -->
-            <!-- LINK TO UPDATE: change href below to your file (e.g. forces_equilibrium.html) -->
-            <!-- ==================================================================== -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-100 flex flex-col justify-between hover:border-amber-400 transition-all duration-200 group">
                 <div class="space-y-4">
                     <!-- Top Icon & Module Badge -->
@@ -119,11 +116,11 @@
 
                     <!-- Module Title & Description -->
                     <div class="space-y-1.5">
-                        <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl group-hover:text-amber-600 transition-colors">
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-amber-600 transition-colors">
                             Forces in Equilibrium
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Simulate horizontal ($F_x$) and vertical ($F_y$) forces acting on an object to analyze balanced ($F_{\text{net}} = 0$) and unbalanced conditions in real-time.
+                            Simulate horizontal (Fx) and vertical (Fy) forces acting on an object to analyze balanced (F<sub>net</sub> = 0) conditions.
                         </p>
                     </div>
 
@@ -133,35 +130,27 @@
                     <ul class="space-y-2 text-xs text-slate-600">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Horizontal & Vertical Equilibrium axis lines ($0,0$)</span>
+                            <span>Equilibrium axis lines (F<sub>net</sub> = 0)</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Real-time acceleration & displacement response</span>
+                            <span>Real-time motion response</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Auto-Balance one-click option ($F_{\text{net}} = 0\text{ N}$)</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Step-by-step mathematical derivation cards</span>
+                            <span>Auto-Balance one-click option</span>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Launch Button -->
-                <!-- UPDATE LINK HERE -->
-                <a href="forces_equilibrium.html" class="mt-6 w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="forces_equilibrium.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 1</span>
                     <i class="fa-solid fa-circle-arrow-right text-base"></i>
                 </a>
             </div>
 
             <!-- CARD 2: MODULE 2 - SINGLE FORCE RESOLUTION -->
-            <!-- ==================================================================== -->
-            <!-- LINK TO UPDATE: change href below to your file (e.g. component_force.html) -->
-            <!-- ==================================================================== -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-100 flex flex-col justify-between hover:border-blue-500 transition-all duration-200 group">
                 <div class="space-y-4">
                     <!-- Top Icon & Module Badge -->
@@ -176,11 +165,11 @@
 
                     <!-- Module Title & Description -->
                     <div class="space-y-1.5">
-                        <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl group-hover:text-blue-600 transition-colors">
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-blue-600 transition-colors">
                             Single Force Resolution
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Focus on a single force $F$ acting at angle ($\theta$). Resolve into horizontal ($F_x$) and vertical ($F_y$) components across Quadrants I to IV.
+                            Resolve a single force F at angle (𝝷) into horizontal (Fx) and vertical (Fy) components across Quadrants I-IV.
                         </p>
                     </div>
 
@@ -190,35 +179,27 @@
                     <ul class="space-y-2 text-xs text-slate-600">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Component Calculation: $F_x = F \cdot \cos(\theta)$ & $F_y = F \cdot \sin(\theta)$</span>
+                            <span>Fx = F. cos(𝝷) & Fy = F. sin(𝝷)</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Supports Inward / Outward Vector directions (IN / OUT)</span>
+                            <span>Inward / Outward Vector direction</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Detailed Step-by-Step Mathematical Calculations</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Interactive Drag & Touch Angle Adjustments</span>
+                            <span>Interactive Drag & Touch Angle</span>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Launch Button -->
-                <!-- UPDATE LINK HERE -->
-                <a href="component_force.html" class="mt-6 w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="component_force.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 2</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
                 </a>
             </div>
 
             <!-- CARD 3: MODULE 3 - MULTI-VECTOR RESULTANT FORCE -->
-            <!-- ==================================================================== -->
-            <!-- LINK TO UPDATE: change href below to your file (e.g. resultant_force.html) -->
-            <!-- ==================================================================== -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-100 flex flex-col justify-between hover:border-purple-500 transition-all duration-200 group">
                 <div class="space-y-4">
                     <!-- Top Icon & Module Badge -->
@@ -233,11 +214,11 @@
 
                     <!-- Module Title & Description -->
                     <div class="space-y-1.5">
-                        <h3 class="font-extrabold text-slate-900 text-lg sm:text-xl group-hover:text-purple-600 transition-colors">
-                            Multi-Vector Resultant Force
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-purple-600 transition-colors">
+                            Multi-Vector Resultant
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Combine multiple concurrent forces simultaneously. Determine Resultant Force Magnitude ($F_R$) and Direction Angle ($\theta$) using Component Tables.
+                            Combine concurrent forces to determine Resultant Force Magnitude (F<sub>R</sub>) and Direction Angle (𝝷) using Component Tables.
                         </p>
                     </div>
 
@@ -247,64 +228,75 @@
                     <ul class="space-y-2 text-xs text-slate-600">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Add Up to 8 Simultaneous Concurrent Forces</span>
+                            <span>Up to 8 concurrent forces</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Concurrent & Polygon (Tip-to-Tail) Visual Modes</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Component Sum Breakdown ($\sum F_x$ and $\sum F_y$)</span>
-                        </li>
-                        <li class="flex items-start gap-2">
-                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Preset Scenarios (Tug of War, Equilibrium, Orthogonal)</span>
+                            <span>Component Sum Breakdown</span>
                         </li>
                     </ul>
                 </div>
 
                 <!-- Launch Button -->
-                <!-- UPDATE LINK HERE -->
-                <a href="resultant_force.html" class="mt-6 w-full py-3 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="resultant_force.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 3</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
                 </a>
             </div>
 
-        </div>
+            <!-- CARD 4: TWO SUPPORTS BEAM REACTION SIMULATOR -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-emerald-200 flex flex-col justify-between hover:border-emerald-500 transition-all duration-200 group">
+                <div class="space-y-4">
+                    <!-- Top Icon & Module Badge -->
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-100 border border-emerald-300 flex items-center justify-center text-emerald-600 text-xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-bridge"></i>
+                        </div>
+                        <span class="bg-emerald-100 text-emerald-900 font-extrabold text-[11px] px-3 py-1 rounded-full border border-emerald-300 uppercase tracking-wider">
+                            MODULE 4
+                        </span>
+                    </div>
 
-        <!-- BOTTOM SECTION: FORMULA REFERENCE & FORCE THEORY -->
-        <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-100 space-y-4">
-            <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <i class="fa-solid fa-book-bookmark text-indigo-600 text-lg"></i>
-                <h3 class="font-extrabold text-slate-800 text-sm sm:text-base">Formula Reference & Force Theory</h3>
+                    <!-- Module Title & Description -->
+                    <div class="space-y-1.5">
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-emerald-600 transition-colors">
+                            Two Supports Beam
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Calculate reaction forces at Support A (F<sub>A</sub>) and Support B (F<sub>B</sub>) using vertical equilibrium and moment equations.
+                        </p>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- Bullet Feature Points -->
+                    <ul class="space-y-2 text-xs text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Adjustable Support A & B positions</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Σ F<sub>up</sub> = Σ F<sub>down</sub> & Σ M<sub>A</sub> = 0</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Upward, downward & angled loads</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Step-by-step exam working derivation</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Launch Button -->
+                <a href="two_supports_beam.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                    <span>LAUNCH SIMULATOR 4</span>
+                    <i class="fa-solid fa-circle-arrow-right text-base text-amber-300"></i>
+                </a>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                <!-- Card 1: X-Axis Component -->
-                <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-4 space-y-1">
-                    <span class="text-xs font-bold text-blue-900 block">1. X-Axis Component ($F_x$)</span>
-                    <div class="font-mono-code font-bold text-sm text-blue-700">$F_x = F \cdot \cos(\theta)$</div>
-                    <p class="text-[11px] text-blue-600">+X = Right &nbsp;|&nbsp; -X = Left</p>
-                </div>
-
-                <!-- Card 2: Y-Axis Component -->
-                <div class="bg-emerald-50/70 border border-emerald-200 rounded-2xl p-4 space-y-1">
-                    <span class="text-xs font-bold text-emerald-900 block">2. Y-Axis Component ($F_y$)</span>
-                    <div class="font-mono-code font-bold text-sm text-emerald-700">$F_y = F \cdot \sin(\theta)$</div>
-                    <p class="text-[11px] text-emerald-600">+Y = Upward &nbsp;|&nbsp; -Y = Downward</p>
-                </div>
-
-                <!-- Card 3: Resultant Force -->
-                <div class="bg-amber-50/70 border border-amber-200 rounded-2xl p-4 space-y-1">
-                    <span class="text-xs font-bold text-amber-900 block">3. Resultant Force ($F_R$)</span>
-                    <div class="font-mono-code font-bold text-sm text-amber-700">$F_R = \sqrt{(\sum F_x)^2 + (\sum F_y)^2}$</div>
-                    <p class="text-[11px] text-amber-600">Vector Pythagorean Theorem</p>
-                </div>
-
-            </div>
         </div>
 
     </main>
