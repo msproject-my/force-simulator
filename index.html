@@ -69,8 +69,14 @@
                 <a href="resultant_force.html" class="bg-indigo-900/80 hover:bg-indigo-800 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 border border-indigo-700/50 transition">
                     <i class="fa-solid fa-diagram-project text-purple-400"></i> Module 3
                 </a>
+                <a href="mom_force_mix.html" class="bg-amber-600/90 hover:bg-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 transition shadow-sm border border-amber-500/50">
+                    <i class="fa-solid fa-crosshairs text-amber-300"></i> Module 4
+                </a>
+                <a href="res_mom_mix.html" class="bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 transition shadow-sm border border-indigo-500/50">
+                    <i class="fa-solid fa-calculator text-amber-300"></i> Module 5
+                </a>
                 <a href="two_supp_beam.html" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2.5 py-1.5 rounded-lg text-[11px] flex items-center gap-1 transition shadow-sm">
-                    <i class="fa-solid fa-bridge text-amber-300"></i> Module 4
+                    <i class="fa-solid fa-bridge text-amber-300"></i> Module 6
                 </a>
             </div>
         </div>
@@ -92,14 +98,14 @@
                     Select Your Interactive Force Simulator
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                    This interactive simulator suite is designed to help you master force component resolution (Fx, Fy), 
-                    forces in equilibrium, quadrant analysis, beam reaction forces (R<sub>A</sub>, R<sub>B</sub>), and multi-vector resultant force calculations (F<sub>R</sub>).
+                    This interactive simulator suite is designed to help you master force component resolution (F<sub>x</sub>, F<sub>y</sub>), 
+                    forces in equilibrium, quadrant analysis, Center of Gravity determination (Method 1 & 2), multi-vector resultant force calculations (F<sub>R</sub>), and beam reaction forces (F<sub>A</sub>, F<sub>B</sub>).
                 </p>
             </div>
         </div>
 
-        <!-- MODULE CARDS GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        <!-- MODULE CARDS GRID (3 Columns x 2 Rows) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
             
             <!-- CARD 1: MODULE 1 - FORCES IN EQUILIBRIUM -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-100 flex flex-col justify-between hover:border-amber-400 transition-all duration-200 group">
@@ -120,7 +126,7 @@
                             Forces in Equilibrium
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Simulate horizontal (Fx) and vertical (Fy) forces acting on an object to analyze balanced (F<sub>net</sub> = 0) conditions.
+                            Simulate horizontal (F<sub>x</sub>) and vertical (F<sub>y</sub>) forces acting on an object to analyze balanced (F<sub>net</sub> = 0) conditions.
                         </p>
                     </div>
 
@@ -169,7 +175,7 @@
                             Single Force Resolution
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Resolve a single force F at angle (𝝷) into horizontal (Fx) and vertical (Fy) components across Quadrants I-IV.
+                            Resolve a single force F at angle (𝝷) into horizontal (F<sub>x</sub>) and vertical (F<sub>y</sub>) components across Quadrants I-IV.
                         </p>
                     </div>
 
@@ -179,7 +185,7 @@
                     <ul class="space-y-2 text-xs text-slate-600">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Fx = F. cos(𝝷) & Fy = F. sin(𝝷)</span>
+                            <span>F<sub>x</sub> = F · cos(𝝷) & F<sub>y</sub> = F · sin(𝝷)</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
@@ -234,6 +240,7 @@
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
                             <span>Component Sum Breakdown</span>
                         </li>
+                      
                     </ul>
                 </div>
 
@@ -244,7 +251,113 @@
                 </a>
             </div>
 
-            <!-- CARD 4: TWO SUPPORTS BEAM REACTION SIMULATOR -->
+            <!-- CARD 4: MODULE 4 (mom_force_mix.html) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-amber-200 flex flex-col justify-between hover:border-amber-500 transition-all duration-200 group">
+                <div class="space-y-4">
+                    <!-- Top Icon & Badge -->
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 text-xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-crosshairs"></i>
+                        </div>
+                        <span class="bg-amber-100 text-amber-900 font-extrabold text-[11px] px-3 py-1 rounded-full border border-amber-300 uppercase tracking-wider">
+                            MODULE 4
+                        </span>
+                    </div>
+
+                    <!-- Title & Description -->
+                    <div class="space-y-1.5">
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-amber-600 transition-colors">
+                            Method 1: Principle Moment of Force
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Determine Center of Gravity (<span class="font-mono-code text-amber-800 font-bold">x</span>) using Principle of Moment of Force (&Sigma; M<sub>CCW</sub> = &Sigma; M<sub>CW</sub>) relative to Pivot O.
+                        </p>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- Bullet Feature Points -->
+                    <ul class="space-y-2 text-xs text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>&Sigma; M<sub>CCW</sub> = &Sigma; M<sub>CW</sub> relative to Fulcrum O</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Upward, downward & angled loads (&theta;)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Auto-snap Fulcrum O to calculated CoG</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Step-by-step algebraic working expansion</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Launch Button -->
+                <a href="mom_force_mix.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                    <span>LAUNCH SIMULATOR 4</span>
+                    <i class="fa-solid fa-circle-arrow-right text-base"></i>
+                </a>
+            </div>
+
+            <!-- CARD 5: MODULE 5(res_mom_mix.html) -->
+            <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-200 flex flex-col justify-between hover:border-indigo-500 transition-all duration-200 group">
+                <div class="space-y-4">
+                    <!-- Top Icon & Badge -->
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-100 border border-indigo-300 flex items-center justify-center text-indigo-700 text-xl group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-calculator"></i>
+                        </div>
+                        <span class="bg-indigo-100 text-indigo-900 font-extrabold text-[11px] px-3 py-1 rounded-full border border-indigo-300 uppercase tracking-wider">
+                            MODULE 5
+                        </span>
+                    </div>
+
+                    <!-- Title & Description -->
+                    <div class="space-y-1.5">
+                        <h3 class="font-extrabold text-slate-900 text-lg group-hover:text-indigo-600 transition-colors">
+                            Method 2 - Resultant Moment of Force
+                        </h3>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Determine Center of Gravity (<span class="font-mono-code text-indigo-800 font-bold">x</span>) using Resultant Moment of Force (&Sigma; M<sub>A</sub> = (&Sigma; F<sub>1</sub>+F<sub>2</sub>+...F<sub>n</sub>&perp;</sub>) &middot; x) relative to Reference Point A.
+                        </p>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- Bullet Feature Points -->
+                    <ul class="space-y-2 text-xs text-slate-600">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Resultant Moment = (&Sigma; F<sub>&perp;</sub>) &middot; x</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Flexible Reference Point A (Left or Right End)</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Perpendicular force (F<sub>&perp;</sub> = F sin&theta;) resolver</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
+                            <span>Step-by-step ratio & equation solver</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Launch Button -->
+                <a href="res_mom_mix.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                    <span>LAUNCH SIMULATOR 5</span>
+                    <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
+                </a>
+            </div>
+
+            <!-- CARD 6: MODULE 6 - TWO SUPPORTS BEAM (PLACED AFTER RES_MOM_MIX) -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-emerald-200 flex flex-col justify-between hover:border-emerald-500 transition-all duration-200 group">
                 <div class="space-y-4">
                     <!-- Top Icon & Module Badge -->
@@ -253,7 +366,7 @@
                             <i class="fa-solid fa-bridge"></i>
                         </div>
                         <span class="bg-emerald-100 text-emerald-900 font-extrabold text-[11px] px-3 py-1 rounded-full border border-emerald-300 uppercase tracking-wider">
-                            MODULE 4
+                            MODULE 6
                         </span>
                     </div>
 
@@ -277,7 +390,7 @@
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Σ F<sub>up</sub> = Σ F<sub>down</sub> & Σ M<sub>A</sub> = 0</span>
+                            <span>&Sigma; F<sub>up</sub> = &Sigma; F<sub>down</sub> & &Sigma; M<sub>A</sub> = 0</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
@@ -292,7 +405,7 @@
 
                 <!-- Launch Button -->
                 <a href="two_supp_beam.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
-                    <span>LAUNCH SIMULATOR 4</span>
+                    <span>LAUNCH SIMULATOR 6</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-300"></i>
                 </a>
             </div>
