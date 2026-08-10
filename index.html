@@ -608,13 +608,14 @@
 
             currentUser = { fullName, role, institution, email };
 
-            // Send data to Google Sheet Web App using no-cors fetch
+            // Send data to Google Sheet Web App using no-cors fetch with keepalive
             try {
                 await fetch(GSHEET_WEB_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullName, role, institution, email, module: "Portal Login" })
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ ...currentUser, module: "Portal Login" }),
+                    keepalive: true
                 });
             } catch (err) {
                 console.error("GSheet Logger Error:", err);
@@ -696,32 +697,29 @@
             }
             if (currentUser) {
                 try {
+                    // Send data with keepalive: true so browser sends it in background even during page navigation
                     fetch(GSHEET_WEB_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ ...currentUser, module: moduleName })
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({ ...currentUser, module: moduleName }),
+                        keepalive: true
                     });
                 } catch (err) {
                     console.error("GSheet Module Logger Error:", err);
                 }
             }
 
-            // Ensure targetUrl is valid and non-empty before navigating
-            if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim() !== '') {
-                setTimeout(() => {
+            // Small delay to allow the background request to queue properly before opening page
+            setTimeout(() => {
+                if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim() !== '') {
                     try {
-                        const destination = new URL(targetUrl, window.location.href || window.location.origin || 'http://localhost/').href;
-                        window.location.href = destination;
-                    } catch (err) {
-                        try {
-                            window.location.assign(targetUrl);
-                        } catch (e) {
-                            console.warn("Could not navigate to target URL:", targetUrl, e);
-                        }
+                        window.location.href = targetUrl;
+                    } catch (e) {
+                        console.warn("Could not navigate to target URL:", targetUrl, e);
                     }
-                }, 150);
-            }
+                }
+            }, 250);
         }
 
         const manualData = {
