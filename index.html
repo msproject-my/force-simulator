@@ -36,6 +36,27 @@
             background: #cbd5e1;
             border-radius: 4px;
         }
+
+        /* Pulsing dot for session active status */
+        .pulse-dot {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 8px rgba(34, 197, 94, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+            }
+        }
     </style>
 </head>
 <body class="text-slate-800 min-h-screen flex flex-col">
@@ -55,11 +76,29 @@
                 </div>
             </div>
             
-            <!-- Navigation Links with Module Buttons for Manual -->
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+            <!-- Navigation Links with Module Buttons for Manual & Auth Widget -->
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="index.html" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold px-3 py-1.5 rounded-xl text-xs flex items-center gap-1 transition shadow-sm cursor-pointer">
                     <i class="fa-solid fa-house"></i> Home
                 </a>
+
+                <!-- Logged-in User Info & Session Timer Widget -->
+                <div id="userLoggedInControls" class="hidden flex items-center gap-2 bg-slate-900/90 border border-indigo-900/60 px-3 py-1.5 rounded-xl text-xs">
+                    <div class="flex items-center gap-1.5 text-slate-200">
+                        <i class="fa-solid fa-user-circle text-amber-400 text-sm"></i>
+                        <span class="font-bold max-w-[100px] sm:max-w-[140px] truncate" id="userDisplayName">User</span>
+                    </div>
+                    <!-- 10-Min Session Timer Badge -->
+                    <div class="bg-slate-950 px-2 py-0.5 rounded-lg border border-slate-800 flex items-center gap-1 text-[11px] text-slate-300" title="10-Minute Inactivity Auto-Logout">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-dot"></span>
+                        <i class="fa-regular fa-clock text-amber-400"></i>
+                        <span id="sessionTimerText" class="font-mono text-emerald-400 font-bold">10:00</span>
+                    </div>
+                    <!-- Logout Button -->
+                    <button onclick="logoutUser()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/30 p-1.5 rounded-lg transition" title="Log Out">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -219,7 +258,7 @@
                     <ul class="space-y-2 text-xs text-slate-600">
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
-                            <span>Up up to 8 concurrent forces</span>
+                            <span>Up to 8 concurrent forces</span>
                         </li>
                         <li class="flex items-start gap-2">
                             <i class="fa-solid fa-circle-check text-emerald-500 mt-0.5"></i>
@@ -289,7 +328,7 @@
                 </a>
             </div>
 
-            <!-- CARD 5: MODULE 5(res_mom_mix.html) -->
+            <!-- CARD 5: MODULE 5 (res_mom_mix.html) -->
             <div class="bg-white rounded-3xl p-6 shadow-sm border-2 border-indigo-200 flex flex-col justify-between hover:border-indigo-500 transition-all duration-200 group">
                 <div class="space-y-4">
                     <!-- Top Icon & Badge Button -->
@@ -309,7 +348,7 @@
                             Method 2 – Resultant Moment of Force
                         </h3>
                         <p class="text-xs text-slate-500 leading-relaxed">
-                            Determine Center of Gravity (<span class="font-mono-code text-indigo-800 font-bold">x</span>) using Resultant Moment of Force (&Sigma; M<sub>A</sub> = (&Sigma; F<sub>1</sub>+F<sub>2</sub>+...F<sub>n</sub>&perp;</sub>) &middot; x) relative to Reference Point A.
+                            Determine Center of Gravity (<span class="font-mono-code text-indigo-800 font-bold">x</span>) using Resultant Moment of Force (&Sigma; M<sub>A</sub> = (&Sigma; F<sub>1</sub>+F<sub>2</sub>+...F<sub>n</sub>&perp;) &middot; x) relative to Reference Point A.
                         </p>
                     </div>
 
@@ -406,6 +445,91 @@
         <p>Force Simulator Portal • Unit Sains JMSK, PPD</p>
     </footer>
 
+    <!-- LOGIN POPUP MODAL (Required on URL Load) -->
+    <div id="loginModal" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-indigo-900/60 text-white w-full max-w-md rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-12 -right-12 w-36 h-36 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <div class="text-center mb-6 relative z-10">
+                <div class="w-12 h-12 rounded-2xl bg-amber-400/20 text-amber-400 border border-amber-400/30 flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fa-solid fa-user-shield"></i>
+                </div>
+                <h3 class="font-heading text-xl sm:text-2xl font-bold text-white">Portal Login</h3>
+                <p class="text-xs text-slate-400 mt-1">Please enter your details to access the simulator portal.</p>
+            </div>
+
+            <!-- Login Form -->
+            <form id="portalLoginForm" onsubmit="handleLoginSubmit(event)" class="space-y-4 relative z-10">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name <span class="text-amber-400">*</span></label>
+                    <input type="text" id="loginFullName" required placeholder="e.g. Ahmad bin Ali" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500 transition">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Role <span class="text-amber-400">*</span></label>
+                        <select id="loginRole" required class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500 transition">
+                            <option value="" disabled selected>Select Role</option>
+                            <option value="Student">Student</option>
+                            <option value="Lecturer / Educator">Lecturer / Educator</option>
+                            <option value="Researcher">Researcher</option>
+                            <option value="Administrator">Administrator</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-1">Institution <span class="text-amber-400">*</span></label>
+                        <select id="loginInstitution" required class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500 transition">
+                            <option value="" disabled selected>Select Institution</option>
+                            <option value="Secondary school">Secondary school</option>
+                            <option value="Community College">Community College</option>
+                            <option value="Polytechnic">Polytechnic</option>
+                            <option value="PHEI (IPTS)">PHEI (IPTS)</option>
+                            <option value="Public University (IPTA)">Public University (IPTA)</option>
+                            <option value="other institutions">Other institutions</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address <span class="text-amber-400">*</span></label>
+                    <input type="email" id="loginEmail" required placeholder="name@institution.edu.my" class="w-full bg-slate-950 border border-slate-800 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-amber-500 transition">
+                </div>
+
+                <button type="submit" id="loginSubmitBtn" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-3 rounded-xl text-xs sm:text-sm transition shadow-lg flex items-center justify-center gap-2 cursor-pointer mt-2">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Login & Enter Portal</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 10-Min Inactivity Auto Logout Warning Modal -->
+    <div id="inactivityModal" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border-2 border-amber-500/50 text-white w-full max-w-md rounded-3xl p-6 text-center shadow-2xl relative">
+            <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto mb-4 text-2xl border border-amber-500/40">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="font-heading text-xl font-bold text-white mb-2">Inactivity Warning!</h3>
+            <p class="text-xs text-slate-300 leading-relaxed mb-4">
+                No activity has been detected for nearly <strong class="text-amber-400">10 minutes</strong>. Your session will automatically log out in:
+            </p>
+
+            <div class="text-3xl font-mono font-extrabold text-amber-400 bg-slate-950 py-3 rounded-2xl border border-slate-800 mb-6 tracking-widest" id="modalCountdownText">
+                01:00
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="extendSession()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-xs transition shadow-md cursor-pointer">
+                    <i class="fa-solid fa-arrows-rotate mr-1"></i> Extend Session
+                </button>
+                <button onclick="logoutUser()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold py-2.5 rounded-xl text-xs transition border border-slate-700 cursor-pointer">
+                    Log Out Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Manual Lightbox Modal Overlay -->
     <div id="manualModal" class="fixed inset-0 z-50 hidden bg-slate-950/90 backdrop-blur-md flex flex-col justify-between p-3 md:p-6" onclick="closeManual()">
         
@@ -438,8 +562,134 @@
 
     </div>
 
-    <!-- JavaScript Functions for Manual Viewer Modal -->
+    <!-- JavaScript Functions for Manual Viewer, Auth, and Google Sheet Logger -->
     <script>
+        const GSHEET_WEB_URL = "https://script.google.com/macros/s/AKfycbznGj0wOX9wNerqKQT170tVmEfyxRaWR_oaYXMxSK7NQqSTB1F2nPK7Nsiuw6dOa5dK/exec";
+
+        let currentUser = null;
+        const SESSION_TIMEOUT_SECONDS = 10 * 60; // 10 minutes
+        const WARNING_THRESHOLD_SECONDS = 60;   // 1 minute remaining warning
+        let timeRemaining = SESSION_TIMEOUT_SECONDS;
+        let sessionTimerInterval = null;
+        let isWarningModalOpen = false;
+
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('forcePortal_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    document.getElementById('loginModal').classList.add('hidden');
+                    updateUserUI();
+                    startSessionTimer();
+                } catch(e) {
+                    document.getElementById('loginModal').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+            }
+
+            // Reset inactivity timer on user interactions
+            ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+                window.addEventListener(evt, resetSessionTimer, { passive: true });
+            });
+        });
+
+        async function handleLoginSubmit(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('loginFullName').value.trim();
+            const role = document.getElementById('loginRole').value;
+            const institution = document.getElementById('loginInstitution').value;
+            const email = document.getElementById('loginEmail').value.trim();
+
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>Submitting to Google Sheet...</span>`;
+
+            currentUser = { fullName, role, institution, email };
+
+            // Send data to Google Sheet Web App using no-cors fetch
+            try {
+                await fetch(GSHEET_WEB_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ fullName, role, institution, email })
+                });
+            } catch (err) {
+                console.error("GSheet Logger Error:", err);
+            }
+
+            sessionStorage.setItem('forcePortal_user', JSON.stringify(currentUser));
+            document.getElementById('loginModal').classList.add('hidden');
+            updateUserUI();
+            startSessionTimer();
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i><span>Login & Enter Portal</span>`;
+        }
+
+        function startSessionTimer() {
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            timeRemaining = SESSION_TIMEOUT_SECONDS;
+
+            sessionTimerInterval = setInterval(() => {
+                if (currentUser) {
+                    timeRemaining--;
+
+                    const minutes = Math.floor(timeRemaining / 60);
+                    const seconds = timeRemaining % 60;
+                    const formattedTime = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    
+                    const timerElem = document.getElementById('sessionTimerText');
+                    if (timerElem) timerElem.textContent = formattedTime;
+
+                    if (timeRemaining <= WARNING_THRESHOLD_SECONDS && timeRemaining > 0) {
+                        if (!isWarningModalOpen) {
+                            isWarningModalOpen = true;
+                            document.getElementById('inactivityModal').classList.remove('hidden');
+                        }
+                        const modalTimerElem = document.getElementById('modalCountdownText');
+                        if (modalTimerElem) modalTimerElem.textContent = formattedTime;
+                    }
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(sessionTimerInterval);
+                        logoutUser();
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetSessionTimer() {
+            if (currentUser && !isWarningModalOpen) {
+                timeRemaining = SESSION_TIMEOUT_SECONDS;
+            }
+        }
+
+        function extendSession() {
+            timeRemaining = SESSION_TIMEOUT_SECONDS;
+            isWarningModalOpen = false;
+            document.getElementById('inactivityModal').classList.add('hidden');
+        }
+
+        function logoutUser() {
+            currentUser = null;
+            sessionStorage.removeItem('forcePortal_user');
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            document.getElementById('inactivityModal').classList.add('hidden');
+            document.getElementById('userLoggedInControls').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('portalLoginForm').reset();
+        }
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userLoggedInControls').classList.remove('hidden');
+                document.getElementById('userDisplayName').textContent = currentUser.fullName;
+            }
+        }
+
         const manualData = {
             1: { title: "Manual Module 1 - Forces in Equilibrium", file: "ManualModul1.png" },
             2: { title: "Manual Module 2 - Single Force Resolution", file: "ManualModul2.png" },
@@ -449,9 +699,6 @@
             6: { title: "Manual Module 6 - Two Supports Beam", file: "ManualModul6.png" }
         };
 
-        /**
-         * Buka Modal Gambar Manual
-         */
         function openManual(id) {
             const data = manualData[id];
             if (!data) return;
@@ -462,20 +709,16 @@
             const modal = document.getElementById('manualModal');
             modal.classList.remove('hidden');
 
-            document.body.style.overflow = 'hidden'; // Kunci scroll belakang
+            document.body.style.overflow = 'hidden';
         }
 
-        /**
-         * Tutup Modal Gambar Manual
-         */
         function closeManual() {
             const modal = document.getElementById('manualModal');
             modal.classList.add('hidden');
 
-            document.body.style.overflow = 'auto'; // Pulihkan scroll
+            document.body.style.overflow = 'auto';
         }
 
-        // Tutup jika tekan butang ESC pada papan kekunci
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') closeManual();
         });
