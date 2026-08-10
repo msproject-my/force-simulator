@@ -172,7 +172,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="force_equilibrium.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="force_equilibrium.html" onclick="launchModule(event, 'Module 1 - Forces in Equilibrium', 'force_equilibrium.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 1</span>
                     <i class="fa-solid fa-circle-arrow-right text-base"></i>
                 </a>
@@ -222,7 +222,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="component_force.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="component_force.html" onclick="launchModule(event, 'Module 2 - Single Force Resolution', 'component_force.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 2</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
                 </a>
@@ -268,7 +268,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="resultant_force.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="resultant_force.html" onclick="launchModule(event, 'Module 3 - Multi-Vector Resultant', 'resultant_force.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 3</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
                 </a>
@@ -322,7 +322,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="mom_force_mix.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="mom_force_mix.html" onclick="launchModule(event, 'Module 4 - Principle Moment of Force', 'mom_force_mix.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-amber-500 hover:bg-amber-600 text-slate-950 transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 4</span>
                     <i class="fa-solid fa-circle-arrow-right text-base"></i>
                 </a>
@@ -376,7 +376,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="res_mom_mix.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="res_mom_mix.html" onclick="launchModule(event, 'Module 5 - Resultant Moment of Force', 'res_mom_mix.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-[#0b1736] hover:bg-indigo-950 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 5</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-400"></i>
                 </a>
@@ -430,7 +430,7 @@
                 </div>
 
                 <!-- Launch Button -->
-                <a href="two_supp_beam.html" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
+                <a href="two_supp_beam.html" onclick="launchModule(event, 'Module 6 - Two Supports Beam', 'two_supp_beam.html')" class="mt-6 w-full py-2.5 px-4 rounded-xl font-extrabold text-xs sm:text-sm bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm flex items-center justify-center gap-2 group-hover:shadow-md cursor-pointer">
                     <span>LAUNCH SIMULATOR 6</span>
                     <i class="fa-solid fa-circle-arrow-right text-base text-amber-300"></i>
                 </a>
@@ -614,7 +614,7 @@
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fullName, role, institution, email })
+                    body: JSON.stringify({ fullName, role, institution, email, module: "Portal Login" })
                 });
             } catch (err) {
                 console.error("GSheet Logger Error:", err);
@@ -687,6 +687,40 @@
             if (currentUser) {
                 document.getElementById('userLoggedInControls').classList.remove('hidden');
                 document.getElementById('userDisplayName').textContent = currentUser.fullName;
+            }
+        }
+
+        async function launchModule(event, moduleName, targetUrl) {
+            if (event) {
+                event.preventDefault();
+            }
+            if (currentUser) {
+                try {
+                    fetch(GSHEET_WEB_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ ...currentUser, module: moduleName })
+                    });
+                } catch (err) {
+                    console.error("GSheet Module Logger Error:", err);
+                }
+            }
+
+            // Ensure targetUrl is valid and non-empty before navigating
+            if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim() !== '') {
+                setTimeout(() => {
+                    try {
+                        const destination = new URL(targetUrl, window.location.href || window.location.origin || 'http://localhost/').href;
+                        window.location.href = destination;
+                    } catch (err) {
+                        try {
+                            window.location.assign(targetUrl);
+                        } catch (e) {
+                            console.warn("Could not navigate to target URL:", targetUrl, e);
+                        }
+                    }
+                }, 150);
             }
         }
 
