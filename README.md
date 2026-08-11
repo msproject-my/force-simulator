@@ -1,6 +1,8 @@
-# Force Simulator Portal
 
-## Copyright
-© 2026 MSProject / Unit Sains JMSK, Politeknik Port Dickson. All Rights Reserved.
 
-See [COPYRIGHT.md](COPYRIGHT.md) for the usage notice.
+## Copyright & Usage
+
+© 2026 Mohd Saiful bin Pahrudin | Unit Sains JMSK, Politeknik Port Dickson  
+All Rights Reserved • For Educational Use Only
+
+Please do not copy, redistribute, rebrand, or reuse the source code or educational materials without permission.
