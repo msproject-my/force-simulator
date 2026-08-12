@@ -6,3 +6,7 @@
 All Rights Reserved • For Educational Use Only
 
 Please do not copy, redistribute, rebrand, or reuse the source code or educational materials without permission.
+
+
+### Source-code protection
+JavaScript in the simulator pages is lightly obfuscated to discourage casual copying while preserving browser functionality.
