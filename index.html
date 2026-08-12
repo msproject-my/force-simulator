@@ -526,9 +526,206 @@
         </div>
     </div>
 
-    <!-- DOMAIN LOCKED & OBFUSCATED JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC (FIXED FUNCTION SCOPING & LOCAL FILE ACCESS) -->
     <script>
-        var _0x3e18=['\x6c\x6f\x63\x61\x6c\x68\x6f\x73\x74','\x31\x32\x37\x2e\x30\x2e\x30\x2e\x31','\x67\x69\x74\x68\x75\x62\x2e\x69\x6f','\x70\x64\x6b\x2e\x65\x64\x75\x2e\x6d\x79','\x70\x6f\x6c\x69\x74\x65\x6b\x6e\x69\x6b\x2e\x65\x64\x75\x2e\x6d\x79','\x6c\x6f\x63\x61\x74\x69\x6f\x6e','\x68\x6f\x73\x74\x6e\x61\x6d\x65','\x44\x4f\x4d\x43\x6f\x6e\x74\x65\x6e\x74\x4c\x6f\x61\x64\x65\x64','\x61\x64\x64\x45\x76\x65\x6e\x74\x4c\x69\x73\x74\x65\x6e\x65\x72','\x62\x6f\x64\x79','\x69\x6e\x6e\x65\x72\x48\x54\x4d\x4c','\x68\x74\x74\x70\x73\x3a\x2f\x2f\x73\x63\x72\x69\x70\x74\x2e\x67\x6f\x6f\x67\x6c\x65\x2e\x63\x6f\x6d\x2f\x6d\x61\x63\x72\x6f\x73\x2f\x73\x2f\x41\x4b\x66\x79\x63\x62\x7a\x6e\x47\x6a\x30\x77\x4f\x58\x39\x77\x4e\x65\x72\x71\x4b\x51\x54\x31\x37\x30\x74\x56\x6d\x45\x66\x79\x78\x52\x61\x57\x52\x5f\x6f\x61\x59\x58\x4d\x78\x53\x4b\x37\x4e\x51\x71\x53\x54\x42\x31\x46\x32\x6e\x50\x4b\x37\x4e\x73\x69\x75\x77\x36\x64\x4f\x61\x35\x64\x4b\x2f\x65\x78\x65\x63','\x66\x6f\x72\x63\x65\x50\x6f\x72\x74\x61\x6c\x5f\x75\x73\x65\x72','\x67\x65\x74\x49\x74\x65\x6d','\x70\x61\x72\x73\x65','\x67\x65\x74\x45\x6c\x65\x6d\x65\x6e\x74\x42\x79\x49\x64','\x6c\x6f\x67\x69\x6e\x4d\x6f\x64\x61\x6c','\x63\x6c\x61\x73\x73\x4c\x69\x73\x74','\x61\x64\x64','\x68\x69\x64\x64\x65\x6e','\x72\x65\x6d\x6f\x76\x65','\x6c\x6f\x67\x69\x6e\x46\x75\x6c\x6c\x4e\x61\x6d\x65','\x76\x61\x6c\x75\x65','\x74\x72\x69\x6d','\x6c\x6f\x67\x69\x6e\x52\x6f\x6c\x65','\x6c\x6f\x67\x69\x6e\x49\x6e\x73\x74\x69\x74\x75\x74\x69\x6f\x6e','\x6c\x6f\x67\x69\x6e\x45\x6d\x61\x69\x6c','\x6c\x6f\x67\x69\x6e\x53\x75\x62\x6d\x69\x74\x42\x74\x6e','\x64\x69\x73\x61\x62\x6c\x65\x64','\x50\x4f\x53\x54','\x6e\x6f\x2d\x63\x6f\x72\x73','\x73\x74\x72\x69\x6e\x67\x69\x66\x79','\x73\x65\x74\x49\x74\x65\x6d','\x69\x6e\x61\x63\x74\x69\x76\x69\x74\x79\x4d\x6f\x64\x61\x6c','\x72\x65\x6d\x6f\x76\x65\x49\x74\x65\x6d','\x75\x73\x65\x72\x4c\x6f\x67\x67\x65\x64\x49\x6e\x43\x6f\x6e\x74\x72\x6f\x6c\x73','\x70\x6f\x72\x74\x61\x6c\x4c\x6f\x67\x69\x6e\x46\x6f\x72\x6d','\x72\x65\x73\x65\x74','\x75\x73\x65\x72\x44\x69\x73\x70\x6c\x61\x79\x4e\x61\x6d\x65','\x74\x65\x78\x74\x43\x6f\x6e\x74\x65\x6e\x74','\x6d\x6f\x64\x61\x6c\x42\x61\x64\x67\x65','\x69\x6e\x6e\x65\x72\x54\x65\x78\x74','\x6d\x61\x6e\x75\x61\x6c\x49\x6d\x61\x67\x65','\x73\x72\x63','\x6d\x61\x6e\x75\x61\x6c\x4d\x6f\x64\x61\x6c','\x6f\x76\x65\x72\x66\x6c\x6f\x77'];(function(_0x2213a7,_0x3e18fb){var _0x1a8f66=function(_0x4e6b12){while(--_0x4e6b12){_0x2213a7['\x70\x75\x73\x68'](_0x2213a7['\x73\x68\x69\x66\x74']());}};_0x1a8f66(++_0x3e18fb);}(_0x3e18,0x1b3));var _0x1a8f=function(_0x2213a7,_0x3e18fb){_0x2213a7=_0x2213a7-0x0;var _0x1a8f66=_0x3e18[_0x2213a7];return _0x1a8f66;};(function(){const _0x538d38=[_0x1a8f('0x0'),_0x1a8f('0x1'),_0x1a8f('0x2'),_0x1a8f('0x3'),_0x1a8f('0x4')];const _0x4bd03d=window[_0x1a8f('0x5')][_0x1a8f('0x6')];const _0x3b1c1d=_0x538d38['some'](_0x4299ba=>_0x4bd03d['endsWith'](_0x4299ba)||_0x4bd03d===_0x4299ba||_0x4bd03d==='');if(!_0x3b1c1d){document[_0x1a8f('0x8')](_0x1a8f('0x7'),function(){document[_0x1a8f('0x9')][_0x1a8f('0xa')]=`\x3c\x64\x69\x76\x20\x73\x74\x79\x6c\x65\x3d\x22\x64\x69\x73\x70\x6c\x61\x79\x3a\x66\x6c\x65\x78\x3b\x66\x6c\x65\x78\x2d\x64\x69\x72\x65\x63\x74\x69\x6f\x6e\x3a\x63\x6f\x6c\x75\x6d\x6e\x3b\x61\x6c\x69\x67\x6e\x2d\x69\x74\x65\x6d\x73\x3a\x63\x65\x6e\x74\x65\x72\x3b\x6a\x75\x73\x74\x69\x66\x79\x2d\x63\x6f\x6e\x74\x65\x6e\x74\x3a\x63\x65\x6e\x74\x65\x72\x3b\x68\x65\x69\x67\x68\x74\x3a\x31\x30\x30\x76\x68\x3b\x62\x61\x63\x6b\x67\x72\x6f\x75\x6e\x64\x3a\x23\x30\x62\x31\x37\x33\x36\x3b\x63\x6f\x6c\x6f\x72\x3a\x23\x77\x68\x69\x74\x65\x3b\x66\x6f\x6e\x74\x2d\x66\x61\x6d\x69\x6c\x79\x3a\x73\x61\x6e\x73\x2d\x73\x65\x72\x69\x66\x3b\x74\x65\x78\x74\x2d\x61\x6c\x69\x67\x6e\x3a\x63\x65\x6e\x74\x65\x72\x3b\x70\x61\x64\x64\x69\x6e\x67\x3a\x32\x30\x70\x78\x3b\x22\x3e\x3c\x68\x31\x20\x73\x74\x79\x6c\x65\x3d\x22\x63\x6f\x6c\x6f\x72\x3a\x23\x66\x34\x33\x66\x35\x65\x3b\x66\x6f\x6e\x74\x2d\x73\x69\x7a\x65\x3a\x32\x34\x70\x78\x3b\x22\x3e\x41\x4b\x53\x45\x53\x20\x44\x49\x54\x4f\x4c\x41\x4b\x20\x28\x44\x4f\x4d\x41\x49\x4e\x20\x4c\x4f\x43\x4b\x29\x3c\x2f\x68\x31\x3e\x3c\x70\x20\x73\x74\x79\x6c\x65\x3d\x22\x6d\x61\x78\x2d\x77\x69\x64\x74\x68\x3a\x35\x30\x30\x70\x78\x3b\x63\x6f\x6c\x6f\x72\x3a\x23\x63\x62\x64\x35\x65\x31\x3b\x66\x6f\x6e\x74\x2d\x73\x69\x7a\x65\x3a\x31\x34\x70\x78\x3b\x6d\x61\x72\x67\x69\x6e\x2d\x74\x6f\x70\x3a\x31\x30\x70\x78\x3b\x22\x3e\x50\x6f\x72\x74\x61\x6c\x20\x53\x69\x6d\x75\x6c\x61\x74\x6f\x72\x20\x69\x6e\x69\x20\x61\x64\x61\x6c\x61\x68\x20\x48\x61\x6b\x20\x43\x69\x70\x74\x61\x20\x54\x65\x72\x70\x65\x6c\x69\x68\x61\x72\x61\x20\x3c\x73\x74\x72\x6f\x6e\x67\x3e\x4d\x6f\x68\x64\x20\x53\x61\x69\x66\x75\x6c\x20\x62\x69\x6e\x20\x50\x61\x68\x72\x75\x64\x69\x6e\x20\x28\x55\x6e\x69\x74\x20\x53\x61\x69\x6e\x73\x20\x4a\x4d\x53\x4b\x2c\x20\x50\x6f\x6c\x69\x74\x65\x6b\x6e\x69\x6b\x20\x50\x6f\x72\x74\x20\x44\x69\x63\x6b\x73\x6f\x6e\x29\x3c\x2f\x73\x74\x72\x6f\x6e\x67\x3e\x2e\x3c\x2f\x70\x3e\x3c\x70\x20\x73\x74\x79\x6c\x65\x3d\x22\x63\x6f\x6c\x6f\x72\x3a\x23\x66\x35\x39\x65\x30\x62\x3b\x66\x6f\x6e\x74\x2d\x73\x69\x7a\x65\x3a\x31\x32\x70\x78\x3b\x6d\x61\x72\x67\x69\x6e\x2d\x74\x6f\x70\x3a\x31\x35\x70\x78\x3b\x22\x3e\x44\x6f\x6d\x61\x69\x6e\x20\x28${_0x4bd03d}\x29\x20\x74\x69\x64\x61\x6b\x20\x64\x69\x62\x65\x6e\x61\x72\x6b\x61\x6e\x2e\x3c\x2f\x70\x3e\x3c\x2f\x64\x69\x76\x3e`;});throw new Error('Unauthorized\x20domain!');}})();const GSHEET_WEB_URL=_0x1a8f('0xb');let currentUser=null;const SESSION_TIMEOUT_SECONDS=0x258;const WARNING_THRESHOLD_SECONDS=0x3c;let timeRemaining=SESSION_TIMEOUT_SECONDS;let sessionTimerInterval=null;let isWarningModalOpen=![];window[_0x1a8f('0x8')]('load',function(){const _0x16b0df=sessionStorage[_0x1a8f('0xd')](_0x1a8f('0xc'));if(_0x16b0df){try{currentUser=JSON[_0x1a8f('0xe')](_0x16b0df);document[_0x1a8f('0xf')](_0x1a8f('0x10'))[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));updateUserUI();startSessionTimer();}catch(_0x27b4e3){document[_0x1a8f('0xf')](_0x1a8f('0x10'))[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));}}else{document[_0x1a8f('0xf')](_0x1a8f('0x10'))[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));}['mousemove','mousedown','keydown','touchstart','scroll','click']['forEach'](function(_0x3b1c60){window[_0x1a8f('0x8')](_0x3b1c60,resetSessionTimer,{'passive':!![]});});});async function handleLoginSubmit(_0x55dcbf){if(_0x55dcbf)_0x55dcbf['preventDefault']();const _0x1a87d0=document[_0x1a8f('0xf')](_0x1a8f('0x15'))[_0x1a8f('0x16')][_0x1a8f('0x17')]();const _0x5b38cb=document[_0x1a8f('0xf')](_0x1a8f('0x18'))[_0x1a8f('0x16')];const _0x136c1e=document[_0x1a8f('0xf')](_0x1a8f('0x19'))[_0x1a8f('0x16')];const _0x2289c8=document[_0x1a8f('0xf')](_0x1a8f('0x1a'))[_0x1a8f('0x16')][_0x1a8f('0x17')]();const _0x4c2b9f=document[_0x1a8f('0xf')](_0x1a8f('0x1b'));_0x4c2b9f[_0x1a8f('0x1c')]=!![];_0x4c2b9f['innerHTML']='\x3c\x69\x20\x63\x6c\x61\x73\x73\x3d\x22\x66\x61\x2d\x73\x6f\x6c\x69\x64\x20\x66\x61\x2d\x73\x70\x69\x6e\x6e\x65\x72\x20\x61\x6e\x69\x6d\x61\x74\x65\x2d\x73\x70\x69\x6e\x22\x3e\x3c\x2f\x69\x3e\x3c\x73\x70\x61\x6e\x3e\x53\x55\x42\x4d\x49\x54\x2e\x2e\x2e\x2e\x3c\x2f\x73\x70\x61\x6e\x3e';currentUser={'fullName':_0x1a87d0,'role':_0x5b38cb,'institution':_0x136c1e,'email':_0x2289c8};try{await fetch(GSHEET_WEB_URL,{'method':_0x1a8f('0x1d'),'mode':_0x1a8f('0x1e'),'headers':{'Content-Type':'text/plain'},'body':JSON[_0x1a8f('0x1f')](Object['assign']({},currentUser,{'module':'Portal\x20Login'})),'keepalive':!![]});}catch(_0x4d667c){}sessionStorage[_0x1a8f('0x20')](_0x1a8f('0xc'),JSON[_0x1a8f('0x1f')](currentUser));document[_0x1a8f('0xf')](_0x1a8f('0x10'))[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));updateUserUI();startSessionTimer();_0x4c2b9f[_0x1a8f('0x1c')]=![];_0x4c2b9f['innerHTML']='\x3c\x69\x20\x63\x6c\x61\x73\x73\x3d\x22\x66\x61\x2d\x73\x6f\x6c\x69\x64\x20\x66\x61\x2d\x72\x69\x67\x68\x74\x2d\x74\x6f\x2d\x62\x72\x61\x63\x6b\x65\x74\x22\x3e\x3c\x2f\x69\x3e\x3c\x73\x70\x61\x6e\x3e\x4c\x6f\x67\x69\x6e\x20\x26\x20\x45\x6e\x74\x65\x72\x20\x50\x6f\x72\x74\x61\x6c\x3c\x2f\x73\x70\x61\x6e\x3e';}function startSessionTimer(){if(sessionTimerInterval)clearInterval(sessionTimerInterval);timeRemaining=SESSION_TIMEOUT_SECONDS;sessionTimerInterval=setInterval(function(){if(currentUser){timeRemaining--;if(timeRemaining<=WARNING_THRESHOLD_SECONDS&&timeRemaining>0x0){if(!isWarningModalOpen){isWarningModalOpen=!![];document[_0x1a8f('0xf')](_0x1a8f('0x21'))[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));}}if(timeRemaining<=0x0){clearInterval(sessionTimerInterval);logoutUser();}}},0x3e8);}function resetSessionTimer(){if(currentUser&&!isWarningModalOpen){timeRemaining=SESSION_TIMEOUT_SECONDS;}}function extendSession(){timeRemaining=SESSION_TIMEOUT_SECONDS;isWarningModalOpen=![];document[_0x1a8f('0xf')](_0x1a8f('0x21'))[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));}function logoutUser(){currentUser=null;sessionStorage[_0x1a8f('0x22')](_0x1a8f('0xc'));if(sessionTimerInterval)clearInterval(sessionTimerInterval);document[_0x1a8f('0xf')](_0x1a8f('0x21'))[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));document[_0x1a8f('0xf')](_0x1a8f('0x23'))[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));document[_0x1a8f('0xf')](_0x1a8f('0x10'))[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));document[_0x1a8f('0xf')](_0x1a8f('0x24'))[_0x1a8f('0x25')]();}function updateUserUI(){if(currentUser){document[_0x1a8f('0xf')](_0x1a8f('0x23'))[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));document[_0x1a8f('0xf')](_0x1a8f('0x26'))[_0x1a8f('0x27')]=currentUser['fullName'];}}async function launchModule(_0x5074e4,_0x43ffb4,_0x2bc8bc){if(_0x5074e4)_0x5074e4['preventDefault']();if(currentUser){try{fetch(GSHEET_WEB_URL,{'method':_0x1a8f('0x1d'),'mode':_0x1a8f('0x1e'),'headers':{'Content-Type':'text/plain'},'body':JSON[_0x1a8f('0x1f')](Object['assign']({},currentUser,{'module':_0x43ffb4})),'keepalive':!![]});}catch(_0x32cf05){}}setTimeout(function(){if(_0x2bc8bc&&typeof _0x2bc8bc==='string'&&_0x2bc8bc[_0x1a8f('0x17')]()!==''){try{window[_0x1a8f('0x5')]['href']=_0x2bc8bc;}catch(_0x3fa1b4){}}},0xfa);}const manualData={0x1:{'title':'Manual\x20Module\x201\x20-\x20Forces\x20in\x20Equilibrium','file':'ManualModul1.png'},0x2:{'title':'Manual\x20Module\x202\x20-\x20Single\x20Force\x20Resolution','file':'ManualModul2.png'},0x3:{'title':'Manual\x20Module\x203\x20-\x20Multi-Vector\x20Resultant','file':'ManualModul3.png'},0x4:{'title':'Manual\x20Module\x204\x20-\x20Principle\x20Moment\x20of\x20Force','file':'ManualModul4.png'},0x5:{'title':'Manual\x20Module\x205\x20-\x20Resultant\x20Moment\x20of\x20Force','file':'ManualModul5.png'},0x6:{'title':'Manual\x20Module\x206\x20-\x20Two\x20Supports\x20Beam','file':'ManualModul6.png'}};function openManual(_0x409dd7){const _0x1f5c6b=manualData[_0x409dd7];if(!_0x1f5c6b)return;document[_0x1a8f('0xf')](_0x1a8f('0x28'))[_0x1a8f('0x29')]=_0x1f5c6b['title'];document[_0x1a8f('0xf')](_0x1a8f('0x2a'))[_0x1a8f('0x2b')]=_0x1f5c6b['file'];const _0x5bf4b3=document[_0x1a8f('0xf')](_0x1a8f('0x2c'));_0x5bf4b3[_0x1a8f('0x11')][_0x1a8f('0x14')](_0x1a8f('0x13'));document[_0x1a8f('0x9')]['style'][_0x1a8f('0x2d')]='\x68\x69\x64\x64\x65\x6e';}function closeManual(){const _0x125b2d=document[_0x1a8f('0xf')](_0x1a8f('0x2c'));_0x125b2d[_0x1a8f('0x11')][_0x1a8f('0x12')](_0x1a8f('0x13'));document[_0x1a8f('0x9')]['style'][_0x1a8f('0x2d')]='\x61\x75\x74\x6f';}document[_0x1a8f('0x8')]('keydown',function(_0x4e6ec3){if(_0x4e6ec3['key']==='Escape')closeManual();});window['handleLoginSubmit']=handleLoginSubmit;window['logoutUser']=logoutUser;window['extendSession']=extendSession;window['openManual']=openManual;window['closeManual']=closeManual;window['launchModule']=launchModule;
+        const GSHEET_WEB_URL = "https://script.google.com/macros/s/AKfycbznGj0wOX9wNerqKQT170tVmEfyxRaWR_oaYXMxSK7NQqSTB1F2nPK7Nsiuw6dOa5dK/exec";
+
+        let currentUser = null;
+        const SESSION_TIMEOUT_SECONDS = 10 * 60; 
+        const WARNING_THRESHOLD_SECONDS = 60;  
+        let timeRemaining = SESSION_TIMEOUT_SECONDS;
+        let sessionTimerInterval = null;
+        let isWarningModalOpen = false;
+
+        // DOMAIN LOCK CHECK
+        (function checkDomain() {
+            const allowedDomains = ["localhost", "127.0.0.1", "github.io", "pdk.edu.my", "politeknik.edu.my"];
+            const currentDomain = window.location.hostname;
+            
+            // Allow local file opening (file:///) and allowed domains
+            const isAllowed = allowedDomains.some(d => currentDomain.endsWith(d) || currentDomain === d || currentDomain === '');
+            
+            if (!isAllowed) {
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.body.innerHTML = `
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0b1736;color:white;font-family:sans-serif;text-align:center;padding:20px;">
+                            <h1 style="color:#f43f5e;font-size:24px;">AKSES DITOLAK (DOMAIN LOCK)</h1>
+                            <p style="max-width:500px;color:#cbd5e1;font-size:14px;margin-top:10px;">
+                                Portal Simulator ini adalah Hak Cipta Terpelihara <strong>Mohd Saiful bin Pahrudin (Unit Sains JMSK, Politeknik Port Dickson)</strong>.
+                            </p>
+                            <p style="color:#f59e0b;font-size:12px;margin-top:15px;">Domain (${currentDomain}) tidak dibenarkan.</p>
+                        </div>`;
+                });
+                throw new Error("Unauthorized domain deployment!");
+            }
+        })();
+
+        window.addEventListener('load', () => {
+            const savedUser = sessionStorage.getItem('forcePortal_user');
+            if (savedUser) {
+                try {
+                    currentUser = JSON.parse(savedUser);
+                    document.getElementById('loginModal').classList.add('hidden');
+                    updateUserUI();
+                    startSessionTimer();
+                } catch(e) {
+                    document.getElementById('loginModal').classList.remove('hidden');
+                }
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+            }
+
+            ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+                window.addEventListener(evt, resetSessionTimer, { passive: true });
+            });
+        });
+
+        window.handleLoginSubmit = async function(event) {
+            if (event) event.preventDefault();
+
+            const fullName = document.getElementById('loginFullName').value.trim();
+            const role = document.getElementById('loginRole').value;
+            const institution = document.getElementById('loginInstitution').value;
+            const email = document.getElementById('loginEmail').value.trim();
+
+            const submitBtn = document.getElementById('loginSubmitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i><span>SUBMIT....</span>`;
+
+            currentUser = { fullName, role, institution, email };
+
+            try {
+                await fetch(GSHEET_WEB_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ ...currentUser, module: "Portal Login" }),
+                    keepalive: true
+                });
+            } catch (err) {
+                console.error("GSheet Logger Error:", err);
+            }
+
+            sessionStorage.setItem('forcePortal_user', JSON.stringify(currentUser));
+            document.getElementById('loginModal').classList.add('hidden');
+            updateUserUI();
+            startSessionTimer();
+
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i class="fa-solid fa-right-to-bracket"></i><span>Login & Enter Portal</span>`;
+        };
+
+        function startSessionTimer() {
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            timeRemaining = SESSION_TIMEOUT_SECONDS;
+
+            sessionTimerInterval = setInterval(() => {
+                if (currentUser) {
+                    timeRemaining--;
+
+                    if (timeRemaining <= WARNING_THRESHOLD_SECONDS && timeRemaining > 0) {
+                        if (!isWarningModalOpen) {
+                            isWarningModalOpen = true;
+                            document.getElementById('inactivityModal').classList.remove('hidden');
+                        }
+                    }
+
+                    if (timeRemaining <= 0) {
+                        clearInterval(sessionTimerInterval);
+                        logoutUser();
+                    }
+                }
+            }, 1000);
+        }
+
+        function resetSessionTimer() {
+            if (currentUser && !isWarningModalOpen) {
+                timeRemaining = SESSION_TIMEOUT_SECONDS;
+            }
+        }
+
+        window.extendSession = function() {
+            timeRemaining = SESSION_TIMEOUT_SECONDS;
+            isWarningModalOpen = false;
+            document.getElementById('inactivityModal').classList.add('hidden');
+        };
+
+        window.logoutUser = function() {
+            currentUser = null;
+            sessionStorage.removeItem('forcePortal_user');
+            if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+            document.getElementById('inactivityModal').classList.add('hidden');
+            document.getElementById('userLoggedInControls').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('portalLoginForm').reset();
+        };
+
+        function updateUserUI() {
+            if (currentUser) {
+                document.getElementById('userLoggedInControls').classList.remove('hidden');
+                document.getElementById('userDisplayName').textContent = currentUser.fullName;
+            }
+        }
+
+        window.launchModule = async function(event, moduleName, targetUrl) {
+            if (event) event.preventDefault();
+            if (currentUser) {
+                try {
+                    fetch(GSHEET_WEB_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'text/plain' },
+                        body: JSON.stringify({ ...currentUser, module: moduleName }),
+                        keepalive: true
+                    });
+                } catch (err) {
+                    console.error("GSheet Module Logger Error:", err);
+                }
+            }
+
+            setTimeout(() => {
+                if (targetUrl && typeof targetUrl === 'string' && targetUrl.trim() !== '') {
+                    try {
+                        window.location.href = targetUrl;
+                    } catch (e) {
+                        console.warn("Could not navigate to target URL:", targetUrl, e);
+                    }
+                }
+            }, 250);
+        };
+
+        const manualData = {
+            1: { title: "Manual Module 1 - Forces in Equilibrium", file: "ManualModul1.png" },
+            2: { title: "Manual Module 2 - Single Force Resolution", file: "ManualModul2.png" },
+            3: { title: "Manual Module 3 - Multi-Vector Resultant", file: "ManualModul3.png" },
+            4: { title: "Manual Module 4 - Principle Moment of Force", file: "ManualModul4.png" },
+            5: { title: "Manual Module 5 - Resultant Moment of Force", file: "ManualModul5.png" },
+            6: { title: "Manual Module 6 - Two Supports Beam", file: "ManualModul6.png" }
+        };
+
+        window.openManual = function(id) {
+            const data = manualData[id];
+            if (!data) return;
+
+            document.getElementById('modalBadge').innerText = data.title;
+            document.getElementById('manualImage').src = data.file;
+
+            const modal = document.getElementById('manualModal');
+            modal.classList.remove('hidden');
+
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeManual = function() {
+            const modal = document.getElementById('manualModal');
+            modal.classList.add('hidden');
+
+            document.body.style.overflow = 'auto';
+        };
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeManual();
+        });
     </script>
 </body>
 </html>
