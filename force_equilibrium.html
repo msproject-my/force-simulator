@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="select-none">
 <head>
     <meta name="copyright" content="© 2026 Mohd Saiful bin Pahrudin | Unit Sains JMSK, Politeknik Port Dickson. All Rights Reserved.">
     <meta charset="UTF-8">
@@ -9,12 +9,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
         
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f0f4f9;
+            background-color: #f8fafc;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Prevent image drag */
+        img {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            pointer-events: auto;
         }
         
         .font-heading {
@@ -46,7 +61,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body class="text-slate-800 min-h-screen flex flex-col" oncontextmenu="return false;" ondragstart="return false;">
 
     <!-- Top Header Banner -->
     <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
@@ -251,7 +266,58 @@
         </div>
     </footer>
 
+    <!-- SECURITY & APPLICATION LOGIC -->
     <script>
+        // 1. ANTI-FRAMING / CLICKJACKING PROTECTION
+        try {
+            if (window.top !== window.self) {
+                window.top.location = window.self.location;
+            }
+        } catch (e) {
+            // Safely catch cross-origin iframe navigation restrictions in preview environments
+        }
+
+        // 2. DOMAIN LOCK CHECK
+        (function checkDomain() {
+            const allowedDomains = ["localhost", "127.0.0.1", "github.io", "pdk.edu.my", "politeknik.edu.my", "usercontent.goog", "googleusercontent.com"];
+            const currentDomain = window.location.hostname;
+            
+            const isAllowed = !currentDomain || window.location.protocol === 'blob:' || allowedDomains.some(d => currentDomain.endsWith(d) || currentDomain === d);
+            
+            if (!isAllowed) {
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.body.innerHTML = `
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0b1736;color:white;font-family:sans-serif;text-align:center;padding:20px;">
+                            <h1 style="color:#f43f5e;font-size:24px;font-weight:800;">AKSES DITOLAK (DOMAIN LOCK)</h1>
+                            <p style="max-width:500px;color:#cbd5e1;font-size:14px;margin-top:10px;line-height:1.6;">
+                                Simulator ini adalah Hak Cipta Terpelihara <strong>Mohd Saiful bin Pahrudin (Unit Sains JMSK, Politeknik Port Dickson)</strong>.
+                            </p>
+                            <p style="color:#f59e0b;font-size:12px;margin-top:15px;background:rgba(245,158,11,0.1);padding:8px 16px;border-radius:8px;">Domain (${currentDomain}) tidak dibenarkan.</p>
+                        </div>`;
+                });
+                throw new Error("Unauthorized domain deployment!");
+            }
+        })();
+
+        // 3. KEYBOARD & DEVTOOLS INSPECTION BLOCKER
+        document.addEventListener('keydown', function(e) {
+            // Prevent F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+                e.preventDefault();
+                return false;
+            }
+            // Prevent Ctrl+U (View Source), Ctrl+S (Save), Ctrl+P (Print)
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's' || e.key === 'P' || e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         // --- GLOBAL STATE & MULTI-FORCE DATA STRUCTURE ---
         let currentMode = 'horizontal'; // 'horizontal', 'vertical', '2d'
         let forceCounter = 5; // Unique ID counter
@@ -467,7 +533,6 @@
             // Equalize Horizontal
             if (sumRight !== sumLeft) {
                 let maxH = Math.max(sumRight, sumLeft);
-                // Adjust first right force or add if missing
                 let rForces = forcesList.filter(f => f.dir === 'right');
                 let lForces = forcesList.filter(f => f.dir === 'left');
 
@@ -830,7 +895,6 @@
                 forces.forEach((f, idx) => {
                     let offset = 0;
                     if (count > 1) {
-                        // Spread stacked arrows symmetrically along box edge
                         offset = (idx - (count - 1) / 2) * 16;
                     }
 
