@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="ms" class="select-none">
 <head>
     <meta name="copyright" content="© 2026 Mohd Saiful bin Pahrudin | Unit Sains JMSK, Politeknik Port Dickson. All Rights Reserved.">
     <meta charset="UTF-8">
@@ -7,14 +7,29 @@
     <title>Interactive Force Component Simulator</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- FontAwesome Icons CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
         
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #f0f4f9;
+            background-color: #f8fafc;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Prevent image drag */
+        img {
+            -webkit-user-drag: none;
+            -khtml-user-drag: none;
+            -moz-user-drag: none;
+            -o-user-drag: none;
+            user-drag: none;
+            pointer-events: auto;
         }
         
         .font-heading {
@@ -33,7 +48,7 @@
             touch-action: none;
         }
 
-        /* Smooth Custom Scrollbar */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -47,7 +62,7 @@
         }
     </style>
 </head>
-<body class="text-slate-800 min-h-screen flex flex-col">
+<body class="text-slate-800 min-h-screen flex flex-col" oncontextmenu="return false;" ondragstart="return false;">
 
     <!-- Top Header Banner -->
     <header class="bg-[#0b1736] text-white shadow-lg sticky top-0 z-50 border-b border-indigo-900/50">
@@ -245,450 +260,454 @@
         </div>
     </footer>
 
-    <!-- OBFUSCATED SIMULATOR ENGINE & DOMAIN LOCK -->
+    <!-- SECURITY, DOMAIN LOCK & SIMULATOR LOGIC -->
     <script>
-        (function() {
-            /* Encrypted String Table */
-            var _0x9f = [
-                'polipd.edu.my', 'localhost', '127.0.0.1', 'googleusercontent.com', 'webcontainer.io', 'github.io', 'vercel.app',
-                'location', 'hostname', 'vectorCanvas', '2d', 'getContext', 'input-fmax', 'slider-f', 'slider-theta',
-                'badge-direction-text', 'INWARD (IN)', 'OUTWARD (OUT)', 'val-f-display', 'val-theta-display',
-                'overlay-quadrant-badge', 'metric-fx-val', 'metric-fx-dir', 'metric-fy-val', 'metric-fy-dir',
-                'metric-fr-val', 'metric-theta-val', 'metric-quadrant-tag', 'math-steps-container', 'QUADRANT I',
-                'QUADRANT II', 'QUADRANT III', 'QUADRANT IV', 'Direction: Right (+X)', 'Direction: Left (-X)',
-                'Direction: Upward (+Y)', 'Direction: Downward (-Y)', 'To the Right', 'To the Left', 'Upward', 'Downward'
-            ];
-
-            function _0x2a(_0x1b) {
-                return _0x9f[_0x1b];
+        // 1. ANTI-FRAMING / CLICKJACKING PROTECTION
+        try {
+            if (window.top !== window.self) {
+                window.top.location = window.self.location;
             }
+        } catch (e) {
+            // Safely catch cross-origin iframe navigation restrictions in preview environments
+        }
 
-            /* --- DOMAIN LOCK CHECK --- */
-            var _curHost = window[_0x2a(7)][_0x2a(8)] || '';
-            var _allowedHosts = [_0x2a(0), _0x2a(1), _0x2a(2), _0x2a(3), _0x2a(4), _0x2a(5), _0x2a(6)];
-            var _isValidDomain = _allowedHosts.some(function(_domain) {
-                return _curHost === _domain || _curHost.endsWith('.' + _domain) || _curHost === '';
-            });
-
-            if (!_isValidDomain) {
-                document.body.innerHTML = `
-                    <div style="display:flex; justify-content:center; align-items:center; min-height:100vh; background:#0b1736; color:#ffffff; font-family:'Plus Jakarta Sans', sans-serif; text-align:center; padding:20px;">
-                        <div style="max-width:500px; background:#1e293b; padding:32px; border-radius:16px; border:1px solid #ef4444; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-                            <div style="font-size:48px; color:#ef4444; margin-bottom:15px;">⚠️</div>
-                            <h1 style="color:#ef4444; font-size:20px; font-weight:800; margin-bottom:12px; text-transform:uppercase;">Akses Ditolak (Domain Lock)</h1>
-                            <p style="color:#cbd5e1; font-size:13px; line-height:1.6; margin-bottom:20px;">
-                                Simulasi interaktif ini dilindungi dan tidak dibenarkan dijalankan di domain ini (<strong>${_curHost || 'File System'}</strong>).
+        // 2. DOMAIN LOCK CHECK
+        (function checkDomain() {
+            const allowedDomains = ["localhost", "127.0.0.1", "github.io", "pdk.edu.my", "politeknik.edu.my", "usercontent.goog", "googleusercontent.com", "webcontainer.io", "vercel.app", "polipd.edu.my"];
+            const currentDomain = window.location.hostname;
+            
+            const isAllowed = !currentDomain || window.location.protocol === 'blob:' || allowedDomains.some(d => currentDomain.endsWith(d) || currentDomain === d);
+            
+            if (!isAllowed) {
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.body.innerHTML = `
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:#0b1736;color:white;font-family:sans-serif;text-align:center;padding:20px;">
+                            <h1 style="color:#f43f5e;font-size:24px;font-weight:800;">AKSES DITOLAK (DOMAIN LOCK)</h1>
+                            <p style="max-width:500px;color:#cbd5e1;font-size:14px;margin-top:10px;line-height:1.6;">
+                                Simulasi ini adalah Hak Cipta Terpelihara <strong>Mohd Saiful bin Pahrudin (Unit Sains JMSK, Politeknik Port Dickson)</strong>.
                             </p>
-                            <hr style="border:0; border-top:1px solid #334155; margin-bottom:16px;">
-                            <p style="color:#94a3b8; font-size:11px;">
-                                © 2026 Mohd Saiful bin Pahrudin | Unit Sains JMSK, Politeknik Port Dickson.
-                            </p>
-                        </div>
-                    </div>`;
-                throw new Error("Domain Lock Triggered");
-            }
-
-            /* --- SIMULATOR LOGIC ENGINE --- */
-            var config = { fMax: 200, F: 120, theta: 45, isInward: false };
-            var isDragging = false;
-            var canvas = null;
-            var ctx = null;
-
-            function initSimulator() {
-                canvas = document.getElementById(_0x2a(9));
-                if (!canvas) return;
-                ctx = canvas[_0x2a(11)](_0x2a(10));
-                resizeCanvas();
-                window.addEventListener('resize', resizeCanvas);
-                setupCanvasInteraction();
-                updateAll();
-            }
-
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                setTimeout(initSimulator, 50);
-            } else {
-                document.addEventListener('DOMContentLoaded', initSimulator);
-            }
-            window.addEventListener('load', initSimulator);
-
-            function resizeCanvas() {
-                if (!canvas) return;
-                var container = canvas.parentElement;
-                if (container) {
-                    canvas.width = container.clientWidth || 400;
-                    canvas.height = container.clientHeight || 400;
-                    drawCanvas();
-                }
-            }
-
-            window.updateFmax = function(val) {
-                var parsed = parseFloat(val);
-                if (isNaN(parsed) || parsed < 10) parsed = 100;
-                config.fMax = parsed;
-                var sliderF = document.getElementById(_0x2a(13));
-                if (sliderF) sliderF.max = config.fMax;
-                if (config.F > config.fMax) {
-                    config.F = config.fMax;
-                    if (sliderF) sliderF.value = config.F;
-                }
-                updateAll();
-            };
-
-            window.toggleDirection = function() {
-                config.isInward = !config.isInward;
-                var btnText = document.getElementById(_0x2a(15));
-                if (btnText) btnText.innerText = config.isInward ? _0x2a(16) : _0x2a(17);
-                updateAll();
-            };
-
-            window.resetSimulator = function() {
-                config.fMax = 200;
-                config.F = 120;
-                config.theta = 45;
-                config.isInward = false;
-                var inFmax = document.getElementById(_0x2a(12));
-                var sliderF = document.getElementById(_0x2a(13));
-                var sliderTheta = document.getElementById(_0x2a(14));
-                var btnText = document.getElementById(_0x2a(15));
-
-                if (inFmax) inFmax.value = 200;
-                if (sliderF) { sliderF.max = 200; sliderF.value = 120; }
-                if (sliderTheta) sliderTheta.value = 45;
-                if (btnText) btnText.innerText = _0x2a(17);
-                updateAll();
-            };
-
-            window.resetVectorToDefault = function() {
-                config.F = 120;
-                config.theta = 45;
-                var sliderF = document.getElementById(_0x2a(13));
-                var sliderTheta = document.getElementById(_0x2a(14));
-                if (sliderF) sliderF.value = 120;
-                if (sliderTheta) sliderTheta.value = 45;
-                updateAll();
-            };
-
-            window.onSliderInputChange = function() {
-                var sliderF = document.getElementById(_0x2a(13));
-                var sliderTheta = document.getElementById(_0x2a(14));
-                config.F = sliderF ? (parseFloat(sliderF.value) || 0) : 120;
-                config.theta = sliderTheta ? (parseFloat(sliderTheta.value) || 0) : 45;
-                updateAll();
-            };
-
-            function getQuadrant(deg) {
-                deg = ((deg % 360) + 360) % 360;
-                if (deg >= 0 && deg < 90) return _0x2a(29);
-                if (deg >= 90 && deg < 180) return _0x2a(30);
-                if (deg >= 180 && deg < 270) return _0x2a(31);
-                return _0x2a(32);
-            }
-
-            function updateAll() {
-                var rad = (config.theta * Math.PI) / 180;
-                var dirMult = config.isInward ? -1 : 1;
-                var Fx = config.F * Math.cos(rad) * dirMult;
-                var Fy = config.F * Math.sin(rad) * dirMult;
-                var qStr = getQuadrant(config.theta);
-
-                var elF = document.getElementById(_0x2a(18));
-                var elTheta = document.getElementById(_0x2a(19));
-                var elBadge = document.getElementById(_0x2a(20));
-
-                if (elF) elF.innerText = config.F.toFixed(1) + ' N';
-                if (elTheta) elTheta.innerText = config.theta.toFixed(1) + '°';
-                if (elBadge) elBadge.innerText = qStr;
-
-                var elFxVal = document.getElementById(_0x2a(21));
-                var elFxDir = document.getElementById(_0x2a(22));
-                if (elFxVal) elFxVal.innerText = (Fx >= 0 ? '+' : '') + Fx.toFixed(2) + ' N';
-                if (elFxDir) elFxDir.innerText = Fx >= 0 ? _0x2a(33) : _0x2a(34);
-
-                var elFyVal = document.getElementById(_0x2a(23));
-                var elFyDir = document.getElementById(_0x2a(24));
-                if (elFyVal) elFyVal.innerText = (Fy >= 0 ? '+' : '') + Fy.toFixed(2) + ' N';
-                if (elFyDir) elFyDir.innerText = Fy >= 0 ? _0x2a(35) : _0x2a(36);
-
-                var elFrVal = document.getElementById(_0x2a(25));
-                var elMetTheta = document.getElementById(_0x2a(26));
-                var elQuadTag = document.getElementById(_0x2a(27));
-                if (elFrVal) elFrVal.innerText = config.F.toFixed(2) + ' N';
-                if (elMetTheta) elMetTheta.innerText = config.theta.toFixed(1) + '°';
-                if (elQuadTag) elQuadTag.innerText = qStr;
-
-                renderMathSteps(Fx, Fy, qStr);
-                drawCanvas();
-            }
-
-            function renderMathSteps(Fx, Fy, qStr) {
-                var container = document.getElementById(_0x2a(28));
-                if (!container) return;
-                var dirFx = Fx >= 0 ? _0x2a(37) : _0x2a(38);
-                var dirFy = Fy >= 0 ? _0x2a(39) : _0x2a(40);
-                var refAngle = Math.abs(config.theta % 90);
-                if ((config.theta >= 90 && config.theta < 180) || (config.theta >= 270 && config.theta < 360)) {
-                    refAngle = 90 - refAngle;
-                }
-
-                container.innerHTML = `
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-blue-900">1. X-Axis Component (F<sub>x</sub>):</div>
-                        <div class="text-slate-800">
-                            F<sub>x</sub> = F · cos(θ) = ${config.F.toFixed(1)} N · cos(${config.theta.toFixed(1)}°) 
-                            = <strong class="text-blue-700">${Fx >= 0 ? '+' : ''}${Fx.toFixed(2)} N</strong> (${dirFx})
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-emerald-900">2. Y-Axis Component (F<sub>y</sub>):</div>
-                        <div class="text-slate-800">
-                            F<sub>y</sub> = F · sin(θ) = ${config.F.toFixed(1)} N · sin(${config.theta.toFixed(1)}°) 
-                            = <strong class="text-emerald-700">${Fy >= 0 ? '+' : ''}${Fy.toFixed(2)} N</strong> (${dirFy})
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-amber-900">3. Resultant Force Magnitude (F<sub>R</sub>):</div>
-                        <div class="text-slate-800">
-                            F<sub>R</sub> = √[F<sub>x</sub>² + F<sub>y</sub>²] 
-                            = √[(${Fx.toFixed(2)})² + (${Fy.toFixed(2)})²] 
-                            = <strong class="text-amber-700">${config.F.toFixed(2)} N</strong>
-                        </div>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                        <div class="font-bold text-purple-900">4. Direction Angle (θ):</div>
-                        <div class="text-slate-800">
-                            X-Axis Reference Angle = tan⁻¹|F<sub>y</sub> / F<sub>x</sub>| 
-                            = tan⁻¹|${Math.abs(Fy).toFixed(2)} / ${Math.abs(Fx).toFixed(2)}| 
-                            = <strong class="text-purple-700">${refAngle.toFixed(1)}°</strong> (${qStr})
-                        </div>
-                        <div class="text-[11px] text-slate-500 italic mt-0.5">
-                            Standard Angle (Counter-Clockwise from +X) = <strong class="text-purple-800">${config.theta.toFixed(1)}°</strong>
-                        </div>
-                    </div>`;
-            }
-
-            function drawArrow(ctx, fromX, fromY, toX, toY, color, width, headLen) {
-                headLen = headLen || 10;
-                var dx = toX - fromX;
-                var dy = toY - fromY;
-                var dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 2) return;
-
-                var angle = Math.atan2(dy, dx);
-                ctx.save();
-                ctx.strokeStyle = color;
-                ctx.fillStyle = color;
-                ctx.lineWidth = width;
-                ctx.lineCap = 'round';
-
-                ctx.beginPath();
-                ctx.moveTo(fromX, fromY);
-                ctx.lineTo(toX, toY);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(toX, toY);
-                ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
-                ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
-                ctx.closePath();
-                ctx.fill();
-                ctx.restore();
-            }
-
-            function drawCanvas() {
-                if (!ctx || !canvas) return;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                var originX = canvas.width / 2;
-                var originY = canvas.height / 2;
-                var maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
-
-                // Concentric circles
-                ctx.strokeStyle = '#e2e8f0';
-                ctx.lineWidth = 1;
-                for (var r = 0.25; r <= 1.0; r += 0.25) {
-                    ctx.beginPath();
-                    ctx.arc(originX, originY, maxRadius * r, 0, Math.PI * 2);
-                    ctx.stroke();
-                }
-
-                // Main Axes
-                ctx.strokeStyle = '#334155';
-                ctx.lineWidth = 1.8;
-                ctx.beginPath();
-                ctx.moveTo(30, originY);
-                ctx.lineTo(canvas.width - 30, originY);
-                ctx.stroke();
-
-                ctx.beginPath();
-                ctx.moveTo(originX, 30);
-                ctx.lineTo(originX, canvas.height - 30);
-                ctx.stroke();
-
-                // Axis Labels
-                ctx.fillStyle = '#475569';
-                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-                ctx.textAlign = 'left';
-                ctx.fillText('+X (0°)', canvas.width - 65, originY - 8);
-                ctx.textAlign = 'right';
-                ctx.fillText('-X (180°)', 70, originY - 8);
-                ctx.textAlign = 'center';
-                ctx.fillText('+Y (90°)', originX + 28, 25);
-                ctx.fillText('-Y (270°)', originX + 30, canvas.height - 15);
-
-                // Quadrant Watermarks
-                ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
-                ctx.font = 'extrabold 16px "Plus Jakarta Sans", sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('QUADRANT I', originX + maxRadius * 0.6, originY - maxRadius * 0.6);
-                ctx.fillText('QUADRANT II', originX - maxRadius * 0.6, originY - maxRadius * 0.6);
-                ctx.fillText('QUADRANT III', originX - maxRadius * 0.6, originY + maxRadius * 0.6);
-                ctx.fillText('QUADRANT IV', originX + maxRadius * 0.6, originY + maxRadius * 0.6);
-
-                var scale = maxRadius / config.fMax;
-                var vectorLenPx = config.F * scale;
-                var rad = (config.theta * Math.PI) / 180;
-                var dirMult = config.isInward ? -1 : 1;
-
-                var vecX = vectorLenPx * Math.cos(rad) * dirMult;
-                var vecY = -vectorLenPx * Math.sin(rad) * dirMult;
-
-                var tipX = originX + vecX;
-                var tipY = originY + vecY;
-
-                var compXx = originX + vecX;
-                var compXy = originY;
-
-                var compYx = originX;
-                var compYy = originY + vecY;
-
-                var calcFx = config.F * Math.cos(rad) * dirMult;
-                var calcFy = config.F * Math.sin(rad) * dirMult;
-
-                // Components
-                drawArrow(ctx, originX, originY, compXx, compXy, '#059669', 2.8, 9);
-                drawArrow(ctx, originX, originY, compYx, compYy, '#0284c7', 2.8, 9);
-
-                // Dashed Projection Lines
-                ctx.save();
-                ctx.strokeStyle = '#0284c7';
-                ctx.lineWidth = 1.5;
-                ctx.setLineDash([5, 4]);
-
-                ctx.beginPath(); ctx.moveTo(compXx, compXy); ctx.lineTo(tipX, tipY); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(compYx, compYy); ctx.lineTo(tipX, tipY); ctx.stroke();
-                ctx.restore();
-
-                // Component Text Labels
-                ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
-                ctx.fillStyle = '#059669';
-                ctx.textAlign = 'center';
-                ctx.fillText(`Fx = ${Math.abs(calcFx).toFixed(1)}N`, originX + vecX / 2, originY + (vecY >= 0 ? 18 : -10));
-
-                ctx.fillStyle = '#0284c7';
-                ctx.textAlign = vecX >= 0 ? 'right' : 'left';
-                ctx.fillText(`Fy = ${Math.abs(calcFy).toFixed(1)}N`, originX + (vecX >= 0 ? -12 : 12), originY + vecY / 2);
-
-                // Angle Arc
-                var arcRadius = Math.min(38, vectorLenPx * 0.5);
-                if (arcRadius > 10) {
-                    ctx.save();
-                    ctx.strokeStyle = '#d97706';
-                    ctx.fillStyle = 'rgba(217, 119, 6, 0.12)';
-                    ctx.lineWidth = 2;
-                    ctx.beginPath();
-                    ctx.moveTo(originX, originY);
-                    ctx.arc(originX, originY, arcRadius, 0, -rad, true);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.stroke();
-                    ctx.restore();
-
-                    var midRad = -rad / 2;
-                    var textRadius = arcRadius + 18;
-                    var arcTextX = originX + textRadius * Math.cos(midRad);
-                    var arcTextY = originY + textRadius * Math.sin(midRad);
-
-                    ctx.fillStyle = '#b45309';
-                    ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
-                    ctx.textAlign = 'center';
-                    ctx.fillText(`θ = ${config.theta.toFixed(0)}°`, arcTextX, arcTextY);
-                }
-
-                // Resultant Force Vector
-                drawArrow(ctx, originX, originY, tipX, tipY, '#dc2626', 3.5, 12);
-
-                // Handle Point
-                ctx.fillStyle = '#991b1b';
-                ctx.strokeStyle = '#ffffff';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(tipX, tipY, 7, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-
-                // Vector Label
-                ctx.font = 'extrabold 13px "Plus Jakarta Sans", sans-serif';
-                ctx.fillStyle = '#dc2626';
-                ctx.textAlign = 'center';
-                ctx.fillText(`F = ${config.F.toFixed(0)} N`, tipX + (vecX >= 0 ? 25 : -25), tipY + (vecY >= 0 ? 18 : -12));
-            }
-
-            function setupCanvasInteraction() {
-                function handlePointerMove(e) {
-                    if (!isDragging || !canvas) return;
-                    var rect = canvas.getBoundingClientRect();
-                    var mouseX = e.clientX - rect.left;
-                    var mouseY = e.clientY - rect.top;
-
-                    var originX = canvas.width / 2;
-                    var originY = canvas.height / 2;
-
-                    var dx = mouseX - originX;
-                    var dy = originY - mouseY;
-
-                    var angleRad = Math.atan2(dy, dx);
-                    var angleDeg = (angleRad * 180) / Math.PI;
-                    if (angleDeg < 0) angleDeg += 360;
-
-                    var distPx = Math.sqrt(dx * dx + dy * dy);
-                    var maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
-                    var calculatedF = (distPx / maxRadius) * config.fMax;
-
-                    calculatedF = Math.max(0, Math.min(config.fMax, calculatedF));
-
-                    config.F = Math.round(calculatedF);
-                    config.theta = Math.round(angleDeg * 2) / 2;
-
-                    var sliderF = document.getElementById(_0x2a(13));
-                    var sliderTheta = document.getElementById(_0x2a(14));
-                    if (sliderF) sliderF.value = config.F;
-                    if (sliderTheta) sliderTheta.value = config.theta;
-
-                    updateAll();
-                }
-
-                if (!canvas) return;
-
-                canvas.addEventListener('mousedown', function(e) {
-                    isDragging = true;
-                    handlePointerMove(e);
+                            <p style="color:#f59e0b;font-size:12px;margin-top:15px;background:rgba(245,158,11,0.1);padding:8px 16px;border-radius:8px;">Domain (${currentDomain}) tidak dibenarkan.</p>
+                        </div>`;
                 });
-
-                window.addEventListener('mousemove', handlePointerMove);
-                window.addEventListener('mouseup', function() { isDragging = false; });
-
-                canvas.addEventListener('touchstart', function(e) {
-                    isDragging = true;
-                    if (e.touches.length > 0) handlePointerMove(e.touches[0]);
-                }, { passive: true });
-
-                window.addEventListener('touchmove', function(e) {
-                    if (isDragging && e.touches.length > 0) handlePointerMove(e.touches[0]);
-                }, { passive: true });
-
-                window.addEventListener('touchend', function() { isDragging = false; });
+                throw new Error("Unauthorized domain deployment!");
             }
         })();
+
+        // 3. KEYBOARD & DEVTOOLS INSPECTION BLOCKER
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+                e.preventDefault();
+                return false;
+            }
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.key === 'S' || e.key === 's' || e.key === 'P' || e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        /* --- SIMULATOR LOGIC ENGINE --- */
+        var config = { fMax: 200, F: 120, theta: 45, isInward: false };
+        var isDragging = false;
+        var canvas = null;
+        var ctx = null;
+
+        function initSimulator() {
+            canvas = document.getElementById('vectorCanvas');
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            setupCanvasInteraction();
+            updateAll();
+        }
+
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            setTimeout(initSimulator, 50);
+        } else {
+            document.addEventListener('DOMContentLoaded', initSimulator);
+        }
+        window.addEventListener('load', initSimulator);
+
+        function resizeCanvas() {
+            if (!canvas) return;
+            var container = canvas.parentElement;
+            if (container) {
+                canvas.width = container.clientWidth || 400;
+                canvas.height = container.clientHeight || 400;
+                drawCanvas();
+            }
+        }
+
+        window.updateFmax = function(val) {
+            var parsed = parseFloat(val);
+            if (isNaN(parsed) || parsed < 10) parsed = 100;
+            config.fMax = parsed;
+            var sliderF = document.getElementById('slider-f');
+            if (sliderF) sliderF.max = config.fMax;
+            if (config.F > config.fMax) {
+                config.F = config.fMax;
+                if (sliderF) sliderF.value = config.F;
+            }
+            updateAll();
+        };
+
+        window.toggleDirection = function() {
+            config.isInward = !config.isInward;
+            var btnText = document.getElementById('badge-direction-text');
+            if (btnText) btnText.innerText = config.isInward ? 'INWARD (IN)' : 'OUTWARD (OUT)';
+            updateAll();
+        };
+
+        window.resetSimulator = function() {
+            config.fMax = 200;
+            config.F = 120;
+            config.theta = 45;
+            config.isInward = false;
+            var inFmax = document.getElementById('input-fmax');
+            var sliderF = document.getElementById('slider-f');
+            var sliderTheta = document.getElementById('slider-theta');
+            var btnText = document.getElementById('badge-direction-text');
+
+            if (inFmax) inFmax.value = 200;
+            if (sliderF) { sliderF.max = 200; sliderF.value = 120; }
+            if (sliderTheta) sliderTheta.value = 45;
+            if (btnText) btnText.innerText = 'OUTWARD (OUT)';
+            updateAll();
+        };
+
+        window.resetVectorToDefault = function() {
+            config.F = 120;
+            config.theta = 45;
+            var sliderF = document.getElementById('slider-f');
+            var sliderTheta = document.getElementById('slider-theta');
+            if (sliderF) sliderF.value = 120;
+            if (sliderTheta) sliderTheta.value = 45;
+            updateAll();
+        };
+
+        window.onSliderInputChange = function() {
+            var sliderF = document.getElementById('slider-f');
+            var sliderTheta = document.getElementById('slider-theta');
+            config.F = sliderF ? (parseFloat(sliderF.value) || 0) : 120;
+            config.theta = sliderTheta ? (parseFloat(sliderTheta.value) || 0) : 45;
+            updateAll();
+        };
+
+        function getQuadrant(deg) {
+            deg = ((deg % 360) + 360) % 360;
+            if (deg >= 0 && deg < 90) return 'QUADRANT I';
+            if (deg >= 90 && deg < 180) return 'QUADRANT II';
+            if (deg >= 180 && deg < 270) return 'QUADRANT III';
+            return 'QUADRANT IV';
+        }
+
+        function updateAll() {
+            var rad = (config.theta * Math.PI) / 180;
+            var dirMult = config.isInward ? -1 : 1;
+            var Fx = config.F * Math.cos(rad) * dirMult;
+            var Fy = config.F * Math.sin(rad) * dirMult;
+            var qStr = getQuadrant(config.theta);
+
+            var elF = document.getElementById('val-f-display');
+            var elTheta = document.getElementById('val-theta-display');
+            var elBadge = document.getElementById('overlay-quadrant-badge');
+
+            if (elF) elF.innerText = config.F.toFixed(1) + ' N';
+            if (elTheta) elTheta.innerText = config.theta.toFixed(1) + '°';
+            if (elBadge) elBadge.innerText = qStr;
+
+            var elFxVal = document.getElementById('metric-fx-val');
+            var elFxDir = document.getElementById('metric-fx-dir');
+            if (elFxVal) elFxVal.innerText = (Fx >= 0 ? '+' : '') + Fx.toFixed(2) + ' N';
+            if (elFxDir) elFxDir.innerText = Fx >= 0 ? 'Direction: Right (+X)' : 'Direction: Left (-X)';
+
+            var elFyVal = document.getElementById('metric-fy-val');
+            var elFyDir = document.getElementById('metric-fy-dir');
+            if (elFyVal) elFyVal.innerText = (Fy >= 0 ? '+' : '') + Fy.toFixed(2) + ' N';
+            if (elFyDir) elFyDir.innerText = Fy >= 0 ? 'Direction: Upward (+Y)' : 'Direction: Downward (-Y)';
+
+            var elFrVal = document.getElementById('metric-fr-val');
+            var elMetTheta = document.getElementById('metric-theta-val');
+            var elQuadTag = document.getElementById('metric-quadrant-tag');
+            if (elFrVal) elFrVal.innerText = config.F.toFixed(2) + ' N';
+            if (elMetTheta) elMetTheta.innerText = config.theta.toFixed(1) + '°';
+            if (elQuadTag) elQuadTag.innerText = qStr;
+
+            renderMathSteps(Fx, Fy, qStr);
+            drawCanvas();
+        }
+
+        function renderMathSteps(Fx, Fy, qStr) {
+            var container = document.getElementById('math-steps-container');
+            if (!container) return;
+            var dirFx = Fx >= 0 ? 'To the Right' : 'To the Left';
+            var dirFy = Fy >= 0 ? 'Upward' : 'Downward';
+            var refAngle = Math.abs(config.theta % 90);
+            if ((config.theta >= 90 && config.theta < 180) || (config.theta >= 270 && config.theta < 360)) {
+                refAngle = 90 - refAngle;
+            }
+
+            container.innerHTML = `
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-blue-900">1. X-Axis Component (F<sub>x</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>x</sub> = F · cos(θ) = ${config.F.toFixed(1)} N · cos(${config.theta.toFixed(1)}°) 
+                        = <strong class="text-blue-700">${Fx >= 0 ? '+' : ''}${Fx.toFixed(2)} N</strong> (${dirFx})
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-emerald-900">2. Y-Axis Component (F<sub>y</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>y</sub> = F · sin(θ) = ${config.F.toFixed(1)} N · sin(${config.theta.toFixed(1)}°) 
+                        = <strong class="text-emerald-700">${Fy >= 0 ? '+' : ''}${Fy.toFixed(2)} N</strong> (${dirFy})
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-amber-900">3. Resultant Force Magnitude (F<sub>R</sub>):</div>
+                    <div class="text-slate-800">
+                        F<sub>R</sub> = √[F<sub>x</sub>² + F<sub>y</sub>²] 
+                        = √[(${Fx.toFixed(2)})² + (${Fy.toFixed(2)})²] 
+                        = <strong class="text-amber-700">${config.F.toFixed(2)} N</strong>
+                    </div>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
+                    <div class="font-bold text-purple-900">4. Direction Angle (θ):</div>
+                    <div class="text-slate-800">
+                        X-Axis Reference Angle = tan⁻¹|F<sub>y</sub> / F<sub>x</sub>| 
+                        = tan⁻¹|${Math.abs(Fy).toFixed(2)} / ${Math.abs(Fx).toFixed(2)}| 
+                        = <strong class="text-purple-700">${refAngle.toFixed(1)}°</strong> (${qStr})
+                    </div>
+                    <div class="text-[11px] text-slate-500 italic mt-0.5">
+                        Standard Angle (Counter-Clockwise from +X) = <strong class="text-purple-800">${config.theta.toFixed(1)}°</strong>
+                    </div>
+                </div>`;
+        }
+
+        function drawArrow(ctx, fromX, fromY, toX, toY, color, width, headLen) {
+            headLen = headLen || 10;
+            var dx = toX - fromX;
+            var dy = toY - fromY;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 2) return;
+
+            var angle = Math.atan2(dy, dx);
+            ctx.save();
+            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
+            ctx.lineWidth = width;
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(fromX, fromY);
+            ctx.lineTo(toX, toY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawCanvas() {
+            if (!ctx || !canvas) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var originX = canvas.width / 2;
+            var originY = canvas.height / 2;
+            var maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
+
+            // Concentric circles
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 1;
+            for (var r = 0.25; r <= 1.0; r += 0.25) {
+                ctx.beginPath();
+                ctx.arc(originX, originY, maxRadius * r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Main Axes
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(30, originY);
+            ctx.lineTo(canvas.width - 30, originY);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(originX, 30);
+            ctx.lineTo(originX, canvas.height - 30);
+            ctx.stroke();
+
+            // Axis Labels
+            ctx.fillStyle = '#475569';
+            ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('+X (0°)', canvas.width - 65, originY - 8);
+            ctx.textAlign = 'right';
+            ctx.fillText('-X (180°)', 70, originY - 8);
+            ctx.textAlign = 'center';
+            ctx.fillText('+Y (90°)', originX + 28, 25);
+            ctx.fillText('-Y (270°)', originX + 30, canvas.height - 15);
+
+            // Quadrant Watermarks
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.35)';
+            ctx.font = 'extrabold 16px "Plus Jakarta Sans", sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('QUADRANT I', originX + maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT II', originX - maxRadius * 0.6, originY - maxRadius * 0.6);
+            ctx.fillText('QUADRANT III', originX - maxRadius * 0.6, originY + maxRadius * 0.6);
+            ctx.fillText('QUADRANT IV', originX + maxRadius * 0.6, originY + maxRadius * 0.6);
+
+            var scale = maxRadius / config.fMax;
+            var vectorLenPx = config.F * scale;
+            var rad = (config.theta * Math.PI) / 180;
+            var dirMult = config.isInward ? -1 : 1;
+
+            var vecX = vectorLenPx * Math.cos(rad) * dirMult;
+            var vecY = -vectorLenPx * Math.sin(rad) * dirMult;
+
+            var tipX = originX + vecX;
+            var tipY = originY + vecY;
+
+            var compXx = originX + vecX;
+            var compXy = originY;
+
+            var compYx = originX;
+            var compYy = originY + vecY;
+
+            var calcFx = config.F * Math.cos(rad) * dirMult;
+            var calcFy = config.F * Math.sin(rad) * dirMult;
+
+            // Components
+            drawArrow(ctx, originX, originY, compXx, compXy, '#059669', 2.8, 9);
+            drawArrow(ctx, originX, originY, compYx, compYy, '#0284c7', 2.8, 9);
+
+            // Dashed Projection Lines
+            ctx.save();
+            ctx.strokeStyle = '#0284c7';
+            ctx.lineWidth = 1.5;
+            ctx.setLineDash([5, 4]);
+
+            ctx.beginPath(); ctx.moveTo(compXx, compXy); ctx.lineTo(tipX, tipY); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(compYx, compYy); ctx.lineTo(tipX, tipY); ctx.stroke();
+            ctx.restore();
+
+            // Component Text Labels
+            ctx.font = 'bold 11px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#059669';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Fx = ${Math.abs(calcFx).toFixed(1)}N`, originX + vecX / 2, originY + (vecY >= 0 ? 18 : -10));
+
+            ctx.fillStyle = '#0284c7';
+            ctx.textAlign = vecX >= 0 ? 'right' : 'left';
+            ctx.fillText(`Fy = ${Math.abs(calcFy).toFixed(1)}N`, originX + (vecX >= 0 ? -12 : 12), originY + vecY / 2);
+
+            // Angle Arc
+            var arcRadius = Math.min(38, vectorLenPx * 0.5);
+            if (arcRadius > 10) {
+                ctx.save();
+                ctx.strokeStyle = '#d97706';
+                ctx.fillStyle = 'rgba(217, 119, 6, 0.12)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(originX, originY);
+                ctx.arc(originX, originY, arcRadius, 0, -rad, true);
+                ctx.closePath();
+                ctx.fill();
+                ctx.stroke();
+                ctx.restore();
+
+                var midRad = -rad / 2;
+                var textRadius = arcRadius + 18;
+                var arcTextX = originX + textRadius * Math.cos(midRad);
+                var arcTextY = originY + textRadius * Math.sin(midRad);
+
+                ctx.fillStyle = '#b45309';
+                ctx.font = 'extrabold 11px "Plus Jakarta Sans", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`θ = ${config.theta.toFixed(0)}°`, arcTextX, arcTextY);
+            }
+
+            // Resultant Force Vector
+            drawArrow(ctx, originX, originY, tipX, tipY, '#dc2626', 3.5, 12);
+
+            // Handle Point
+            ctx.fillStyle = '#991b1b';
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(tipX, tipY, 7, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Vector Label
+            ctx.font = 'extrabold 13px "Plus Jakarta Sans", sans-serif';
+            ctx.fillStyle = '#dc2626';
+            ctx.textAlign = 'center';
+            ctx.fillText(`F = ${config.F.toFixed(0)} N`, tipX + (vecX >= 0 ? 25 : -25), tipY + (vecY >= 0 ? 18 : -12));
+        }
+
+        function setupCanvasInteraction() {
+            function handlePointerMove(e) {
+                if (!isDragging || !canvas) return;
+                var rect = canvas.getBoundingClientRect();
+                var mouseX = e.clientX - rect.left;
+                var mouseY = e.clientY - rect.top;
+
+                var originX = canvas.width / 2;
+                var originY = canvas.height / 2;
+
+                var dx = mouseX - originX;
+                var dy = originY - mouseY;
+
+                var angleRad = Math.atan2(dy, dx);
+                var angleDeg = (angleRad * 180) / Math.PI;
+                if (angleDeg < 0) angleDeg += 360;
+
+                var distPx = Math.sqrt(dx * dx + dy * dy);
+                var maxRadius = Math.min(canvas.width, canvas.height) * 0.38;
+                var calculatedF = (distPx / maxRadius) * config.fMax;
+
+                calculatedF = Math.max(0, Math.min(config.fMax, calculatedF));
+
+                config.F = Math.round(calculatedF);
+                config.theta = Math.round(angleDeg * 2) / 2;
+
+                var sliderF = document.getElementById('slider-f');
+                var sliderTheta = document.getElementById('slider-theta');
+                if (sliderF) sliderF.value = config.F;
+                if (sliderTheta) sliderTheta.value = config.theta;
+
+                updateAll();
+            }
+
+            if (!canvas) return;
+
+            canvas.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                handlePointerMove(e);
+            });
+
+            window.addEventListener('mousemove', handlePointerMove);
+            window.addEventListener('mouseup', function() { isDragging = false; });
+
+            canvas.addEventListener('touchstart', function(e) {
+                isDragging = true;
+                if (e.touches.length > 0) handlePointerMove(e.touches[0]);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', function(e) {
+                if (isDragging && e.touches.length > 0) handlePointerMove(e.touches[0]);
+            }, { passive: true });
+
+            window.addEventListener('touchend', function() { isDragging = false; });
+        }
     </script>
 </body>
 </html>
-
